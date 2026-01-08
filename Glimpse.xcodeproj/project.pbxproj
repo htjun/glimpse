@@ -1,0 +1,556 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		E9EBF9FC2F10730800D6CA79 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9EBF9E52F10730600D6CA79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9EBF9EC2F10730600D6CA79;
+			remoteInfo = Glimpse;
+		};
+		E9EBFA062F10730800D6CA79 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9EBF9E52F10730600D6CA79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9EBF9EC2F10730600D6CA79;
+			remoteInfo = Glimpse;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E9EBF9ED2F10730700D6CA79 /* Glimpse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glimpse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9EBF9FB2F10730800D6CA79 /* GlimpseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlimpseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9EBFA052F10730800D6CA79 /* GlimpseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlimpseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E9EBF9EF2F10730700D6CA79 /* Glimpse */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Glimpse;
+			sourceTree = "<group>";
+		};
+		E9EBF9FE2F10730800D6CA79 /* GlimpseTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GlimpseTests;
+			sourceTree = "<group>";
+		};
+		E9EBFA082F10730800D6CA79 /* GlimpseUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = GlimpseUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E9EBF9EA2F10730600D6CA79 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EBF9F82F10730800D6CA79 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EBFA022F10730800D6CA79 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E9EBF9E42F10730600D6CA79 = {
+			isa = PBXGroup;
+			children = (
+				E9EBF9EF2F10730700D6CA79 /* Glimpse */,
+				E9EBF9FE2F10730800D6CA79 /* GlimpseTests */,
+				E9EBFA082F10730800D6CA79 /* GlimpseUITests */,
+				E9EBF9EE2F10730700D6CA79 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E9EBF9EE2F10730700D6CA79 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E9EBF9ED2F10730700D6CA79 /* Glimpse.app */,
+				E9EBF9FB2F10730800D6CA79 /* GlimpseTests.xctest */,
+				E9EBFA052F10730800D6CA79 /* GlimpseUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E9EBF9EC2F10730600D6CA79 /* Glimpse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9EBFA0F2F10730800D6CA79 /* Build configuration list for PBXNativeTarget "Glimpse" */;
+			buildPhases = (
+				E9EBF9E92F10730600D6CA79 /* Sources */,
+				E9EBF9EA2F10730600D6CA79 /* Frameworks */,
+				E9EBF9EB2F10730600D6CA79 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E9EBF9EF2F10730700D6CA79 /* Glimpse */,
+			);
+			name = Glimpse;
+			packageProductDependencies = (
+			);
+			productName = Glimpse;
+			productReference = E9EBF9ED2F10730700D6CA79 /* Glimpse.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E9EBF9FA2F10730800D6CA79 /* GlimpseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9EBFA122F10730800D6CA79 /* Build configuration list for PBXNativeTarget "GlimpseTests" */;
+			buildPhases = (
+				E9EBF9F72F10730800D6CA79 /* Sources */,
+				E9EBF9F82F10730800D6CA79 /* Frameworks */,
+				E9EBF9F92F10730800D6CA79 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E9EBF9FD2F10730800D6CA79 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E9EBF9FE2F10730800D6CA79 /* GlimpseTests */,
+			);
+			name = GlimpseTests;
+			packageProductDependencies = (
+			);
+			productName = GlimpseTests;
+			productReference = E9EBF9FB2F10730800D6CA79 /* GlimpseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E9EBFA042F10730800D6CA79 /* GlimpseUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E9EBFA152F10730800D6CA79 /* Build configuration list for PBXNativeTarget "GlimpseUITests" */;
+			buildPhases = (
+				E9EBFA012F10730800D6CA79 /* Sources */,
+				E9EBFA022F10730800D6CA79 /* Frameworks */,
+				E9EBFA032F10730800D6CA79 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E9EBFA072F10730800D6CA79 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E9EBFA082F10730800D6CA79 /* GlimpseUITests */,
+			);
+			name = GlimpseUITests;
+			packageProductDependencies = (
+			);
+			productName = GlimpseUITests;
+			productReference = E9EBFA052F10730800D6CA79 /* GlimpseUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E9EBF9E52F10730600D6CA79 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					E9EBF9EC2F10730600D6CA79 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					E9EBF9FA2F10730800D6CA79 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = E9EBF9EC2F10730600D6CA79;
+					};
+					E9EBFA042F10730800D6CA79 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = E9EBF9EC2F10730600D6CA79;
+					};
+				};
+			};
+			buildConfigurationList = E9EBF9E82F10730600D6CA79 /* Build configuration list for PBXProject "Glimpse" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E9EBF9E42F10730600D6CA79;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = E9EBF9EE2F10730700D6CA79 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E9EBF9EC2F10730600D6CA79 /* Glimpse */,
+				E9EBF9FA2F10730800D6CA79 /* GlimpseTests */,
+				E9EBFA042F10730800D6CA79 /* GlimpseUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E9EBF9EB2F10730600D6CA79 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EBF9F92F10730800D6CA79 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EBFA032F10730800D6CA79 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E9EBF9E92F10730600D6CA79 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EBF9F72F10730800D6CA79 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9EBFA012F10730800D6CA79 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E9EBF9FD2F10730800D6CA79 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9EBF9EC2F10730600D6CA79 /* Glimpse */;
+			targetProxy = E9EBF9FC2F10730800D6CA79 /* PBXContainerItemProxy */;
+		};
+		E9EBFA072F10730800D6CA79 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9EBF9EC2F10730600D6CA79 /* Glimpse */;
+			targetProxy = E9EBFA062F10730800D6CA79 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E9EBFA0D2F10730800D6CA79 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E9EBFA0E2F10730800D6CA79 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		E9EBFA102F10730800D6CA79 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Glimpse/Glimpse.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.Glimpse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E9EBFA112F10730800D6CA79 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Glimpse/Glimpse.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.Glimpse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E9EBFA132F10730800D6CA79 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glimpse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Glimpse";
+			};
+			name = Debug;
+		};
+		E9EBFA142F10730800D6CA79 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glimpse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Glimpse";
+			};
+			name = Release;
+		};
+		E9EBFA162F10730800D6CA79 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Glimpse;
+			};
+			name = Debug;
+		};
+		E9EBFA172F10730800D6CA79 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PUBLICTEAMID;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Glimpse;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E9EBF9E82F10730600D6CA79 /* Build configuration list for PBXProject "Glimpse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9EBFA0D2F10730800D6CA79 /* Debug */,
+				E9EBFA0E2F10730800D6CA79 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E9EBFA0F2F10730800D6CA79 /* Build configuration list for PBXNativeTarget "Glimpse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9EBFA102F10730800D6CA79 /* Debug */,
+				E9EBFA112F10730800D6CA79 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E9EBFA122F10730800D6CA79 /* Build configuration list for PBXNativeTarget "GlimpseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9EBFA132F10730800D6CA79 /* Debug */,
+				E9EBFA142F10730800D6CA79 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E9EBFA152F10730800D6CA79 /* Build configuration list for PBXNativeTarget "GlimpseUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9EBFA162F10730800D6CA79 /* Debug */,
+				E9EBFA172F10730800D6CA79 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E9EBF9E52F10730600D6CA79 /* Project object */;
+}
