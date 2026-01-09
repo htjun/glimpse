@@ -65,10 +65,3 @@ Glimpse/
 ## Dependencies
 
 - **KeyboardShortcuts** (Sindre Sorhus) - Global hotkey registration via SPM
-
-## Code Style
-
-- 4-space indentation, 120 char line limit
-- File headers required (see `.swiftlint.yml` pattern)
-- Use `Self.` for static properties, `@MainActor` on UI-related classes
-- MARK comments for code organization (`// MARK: - Section`)
