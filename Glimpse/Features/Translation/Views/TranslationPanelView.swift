@@ -7,6 +7,7 @@
 
 import AppKit
 import SwiftUI
+import Translation
 
 /// Main translation panel view - floating window activated by hotkey.
 struct TranslationPanelView: View {
@@ -16,8 +17,13 @@ struct TranslationPanelView: View {
     @State private var inputText: String = ""
     @State private var translatedText: String = ""
     @State private var isTranslating: Bool = false
+    @State private var translationError: String?
     @FocusState private var isInputFocused: Bool
     @Environment(\.dismiss) private var dismiss
+
+    /// Configuration for the Translation API session.
+    /// When set/invalidated, triggers the .translationTask modifier.
+    @State private var translationConfiguration: TranslationSession.Configuration?
 
     // MARK: - Body
 
@@ -33,17 +39,23 @@ struct TranslationPanelView: View {
                 .background(Color(nsColor: .textBackgroundColor))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .onSubmit {
-                    translateText()
+                    triggerTranslation()
                 }
 
-            // Translation result
-            if !translatedText.isEmpty || isTranslating {
+            // Translation result or error
+            if !translatedText.isEmpty || isTranslating || translationError != nil {
                 Divider()
 
                 if isTranslating {
                     ProgressView()
                         .scaleEffect(0.8)
                         .frame(maxWidth: .infinity, minHeight: 40)
+                } else if let error = translationError {
+                    Text(error)
+                        .font(.system(size: 14))
+                        .foregroundStyle(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
                 } else {
                     Text(translatedText)
                         .font(.system(size: 18))
@@ -67,7 +79,7 @@ struct TranslationPanelView: View {
                 Spacer()
 
                 Button("Translate") {
-                    translateText()
+                    triggerTranslation()
                 }
                 .keyboardShortcut(.return, modifiers: .command)
                 .disabled(inputText.isEmpty || isTranslating)
@@ -86,25 +98,49 @@ struct TranslationPanelView: View {
             }
             isInputFocused = true
         }
+        .translationTask(translationConfiguration) { @Sendable session in
+            // Capture the text before crossing isolation boundary
+            let textToTranslate = await MainActor.run { inputText }
+
+            do {
+                let response = try await session.translate(textToTranslate)
+                await MainActor.run {
+                    translatedText = response.targetText
+                    translationError = nil
+                    isTranslating = false
+                }
+            } catch {
+                await MainActor.run {
+                    translationError = "Translation failed: \(error.localizedDescription)"
+                    translatedText = ""
+                    isTranslating = false
+                }
+            }
+        }
     }
 
     // MARK: - Private Methods
 
-    private func translateText() {
+    /// Triggers translation by setting/invalidating the configuration.
+    private func triggerTranslation() {
         guard !inputText.isEmpty else { return }
 
         isTranslating = true
+        translationError = nil
 
-        // TODO: Implement actual translation using Apple Translation API
-        // For now, simulate a translation delay
-        Task {
-            try? await Task.sleep(for: .milliseconds(500))
-            await MainActor.run {
-                translatedText = "Translation of: \"\(inputText)\""
-                isTranslating = false
-            }
+        if translationConfiguration == nil {
+            // First translation: create configuration
+            // source: nil means auto-detect language
+            translationConfiguration = TranslationSession.Configuration(
+                source: Locale.Language(identifier: "en"),
+                target: Locale.Language(identifier: "ko")
+            )
+        } else {
+            // Subsequent translations: invalidate to re-trigger
+            translationConfiguration?.invalidate()
         }
     }
+
 }
 
 #Preview {
