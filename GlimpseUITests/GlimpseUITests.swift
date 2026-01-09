@@ -27,6 +27,9 @@ final class GlimpseUITests: XCTestCase {
         // Menu bar apps may not report foreground state correctly
         // Just verify the app object exists after launch (no crash)
         XCTAssertNotNil(app)
+
+        // Explicitly terminate - menu bar apps don't auto-terminate
+        app.terminate()
     }
 
     @MainActor

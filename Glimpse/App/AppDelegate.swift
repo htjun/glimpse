@@ -47,13 +47,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Private Methods
 
     private func checkAccessibilityPermissions() {
-        let options: [String: Bool] = [Self.accessibilityPromptKey: true]
+        // Skip prompting during UI tests to prevent blocking dialogs
+        let isRunningUITests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        let options: [String: Bool] = [Self.accessibilityPromptKey: !isRunningUITests]
         let accessibilityEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
 
         if accessibilityEnabled {
             logger.info("Accessibility permissions granted")
         } else {
-            logger.warning("Accessibility permissions not granted - selected text capture will be unavailable")
+            if isRunningUITests {
+                logger.info("Accessibility prompt skipped during UI tests")
+            } else {
+                logger.warning("Accessibility permissions not granted - selected text capture will be unavailable")
+            }
         }
     }
 
