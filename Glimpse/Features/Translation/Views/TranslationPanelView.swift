@@ -123,14 +123,14 @@ struct TranslationPanelView: View {
 
             // Populate input with captured text if already available (race condition handling)
             if let capturedText = TranslationViewModel.shared.consumeCapturedText() {
-                inputText = capturedText
+                applyAndTranslate(capturedText)
             }
             isInputFocused = true
         }
         .onChange(of: TranslationViewModel.shared.capturedText) { _, newValue in
             // Handle late-arriving captured text (async text capture)
             if newValue != nil, let text = TranslationViewModel.shared.consumeCapturedText() {
-                inputText = text
+                applyAndTranslate(text)
             }
         }
         .translationTask(translationConfiguration) { @Sendable session in
@@ -155,6 +155,12 @@ struct TranslationPanelView: View {
     }
 
     // MARK: - Private Methods
+
+    /// Applies captured text to input and triggers translation.
+    private func applyAndTranslate(_ text: String) {
+        inputText = text
+        triggerTranslation()
+    }
 
     /// Triggers translation by setting/invalidating the configuration.
     private func triggerTranslation() {

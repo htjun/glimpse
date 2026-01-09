@@ -22,11 +22,26 @@ final class GlimpseUITests: XCTestCase {
         // Glimpse is a menu bar app (LSUIElement) so it has no main window.
         // This test verifies the app launches without crashing.
         let app = XCUIApplication()
+
+        // Terminate any existing instance first (e.g., if running in Xcode)
+        app.terminate()
+
+        // Launch and wait for the app to initialize
         app.launch()
 
-        // Menu bar apps may not report foreground state correctly
-        // Just verify the app object exists after launch (no crash)
-        XCTAssertNotNil(app)
+        // Poll for app to reach a running state (menu bar apps need time to settle)
+        let deadline = Date().addingTimeInterval(5.0)
+        while Date() < deadline {
+            if app.state == .runningForeground || app.state == .runningBackground {
+                break
+            }
+            Thread.sleep(forTimeInterval: 0.1)
+        }
+
+        XCTAssertTrue(
+            app.state == .runningForeground || app.state == .runningBackground,
+            "App should be running after launch, but state is \(app.state.rawValue)"
+        )
 
         // Explicitly terminate - menu bar apps don't auto-terminate
         app.terminate()

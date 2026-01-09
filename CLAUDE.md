@@ -65,3 +65,8 @@ Glimpse/
 ## Dependencies
 
 - **KeyboardShortcuts** (Sindre Sorhus) - Global hotkey registration via SPM
+
+## Testing Notes
+
+- **UI tests require the app to not be running**: UI tests will fail/timeout if Glimpse is already running (e.g., launched from Xcode). The tests terminate any existing instance before launching, but if the app is stuck or unresponsive, manually quit it before running tests.
+- **Accessibility prompt is skipped in tests**: The app detects `XCTestConfigurationFilePath` environment variable to skip the accessibility permission dialog during UI tests.
