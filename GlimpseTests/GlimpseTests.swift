@@ -8,10 +8,6 @@
 import Testing
 @testable import Glimpse
 
-struct GlimpseTests {
-
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    }
-
-}
+// Main test file - individual test suites are in separate files:
+// - TranslationViewModelTests.swift
+// - WindowManagerTests.swift
