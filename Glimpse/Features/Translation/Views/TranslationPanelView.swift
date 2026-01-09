@@ -29,60 +29,68 @@ struct TranslationPanelView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            // Input text field with loading overlay
-            ZStack(alignment: .leading) {
-                TextField("Enter text to translate...", text: $inputText, axis: .vertical)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 18))
-                    .lineLimit(1...5)
-                    .focused($isInputFocused)
-                    .opacity(TranslationViewModel.shared.isCapturingText && inputText.isEmpty ? 0.3 : 1)
-                    .onSubmit {
-                        triggerTranslation()
-                    }
+            // Scrollable content area with max height
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Input text field with loading overlay
+                    ZStack(alignment: .leading) {
+                        TextField("Enter text to translate...", text: $inputText, axis: .vertical)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 18))
+                            .lineLimit(1...)
+                            .focused($isInputFocused)
+                            .opacity(TranslationViewModel.shared.isCapturingText && inputText.isEmpty ? 0.3 : 1)
+                            .onSubmit {
+                                triggerTranslation()
+                            }
 
-                // Show subtle loading indicator while capturing text
-                if TranslationViewModel.shared.isCapturingText && inputText.isEmpty {
-                    HStack(spacing: 8) {
-                        ProgressView()
-                            .scaleEffect(0.6)
-                        Text("Capturing text...")
-                            .foregroundStyle(.secondary)
-                            .font(.system(size: 14))
+                        // Show subtle loading indicator while capturing text
+                        if TranslationViewModel.shared.isCapturingText && inputText.isEmpty {
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .scaleEffect(0.6)
+                                Text("Capturing text...")
+                                    .foregroundStyle(.secondary)
+                                    .font(.system(size: 14))
+                            }
+                            .padding(.leading, 4)
+                        }
                     }
-                    .padding(.leading, 4)
+                    .padding(12)
+                    .background(Color(nsColor: .textBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    // Translation result or error
+                    if !translatedText.isEmpty || isTranslating || translationError != nil {
+                        Divider()
+
+                        if isTranslating {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                                .frame(maxWidth: .infinity, minHeight: 40)
+                        } else if let error = translationError {
+                            Text(error)
+                                .font(.system(size: 14))
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(12)
+                        } else {
+                            Text(translatedText)
+                                .font(.system(size: 18))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                                .padding(12)
+                                .background(Color.accentColor.opacity(0.1))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
                 }
             }
-            .padding(12)
-            .background(Color(nsColor: .textBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .frame(maxHeight: 600)
+            .scrollBounceBehavior(.basedOnSize)
 
-            // Translation result or error
-            if !translatedText.isEmpty || isTranslating || translationError != nil {
-                Divider()
-
-                if isTranslating {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                } else if let error = translationError {
-                    Text(error)
-                        .font(.system(size: 14))
-                        .foregroundStyle(.red)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                } else {
-                    Text(translatedText)
-                        .font(.system(size: 18))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .padding(12)
-                        .background(Color.accentColor.opacity(0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                }
-            }
-
-            // Action buttons
+            // Action buttons (always visible outside scroll area)
             HStack {
                 // Hidden escape button to capture Escape key
                 Button("") {
