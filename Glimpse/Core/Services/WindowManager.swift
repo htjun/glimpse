@@ -84,6 +84,15 @@ final class WindowManager {
         }
     }
 
+    /// Transfer focus to the panel (makes it the key window)
+    func focusPanel() {
+        if let window = window {
+            activateApp()
+            window.makeKeyAndOrderFront(nil)
+            logger.debug("Panel focused (made key window)")
+        }
+    }
+
     /// Reset state (for testing)
     func reset() {
         panelWindow = nil
@@ -93,9 +102,11 @@ final class WindowManager {
     // MARK: - Private Methods
 
     private func openPanel(window: any WindowProtocol) {
-        window.makeKeyAndOrderFront(nil)
-        activateApp()
-        logger.debug("Translation panel opened")
+        // Show panel WITHOUT stealing focus from source app
+        // This allows text capture to work (source app stays focused)
+        window.orderFrontRegardless()
+        // DON'T call activateApp() - let source app keep focus for text capture
+        logger.debug("Translation panel opened (without stealing focus)")
     }
 
     private func closePanel(window: any WindowProtocol) {

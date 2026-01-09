@@ -15,10 +15,16 @@ import Testing
 final class MockWindow: WindowProtocol {
     var isVisible: Bool = false
     var makeKeyAndOrderFrontCalled = false
+    var orderFrontRegardlessCalled = false
     var closeCalled = false
 
     func makeKeyAndOrderFront(_ sender: Any?) {
         makeKeyAndOrderFrontCalled = true
+        isVisible = true
+    }
+
+    func orderFrontRegardless() {
+        orderFrontRegardlessCalled = true
         isVisible = true
     }
 
@@ -30,6 +36,7 @@ final class MockWindow: WindowProtocol {
     func reset() {
         isVisible = false
         makeKeyAndOrderFrontCalled = false
+        orderFrontRegardlessCalled = false
         closeCalled = false
     }
 }
@@ -70,7 +77,8 @@ struct WindowManagerTests {
         manager.registerWindow(mockWindow)
         manager.togglePanel()
 
-        #expect(mockWindow.makeKeyAndOrderFrontCalled == true)
+        // Should use orderFrontRegardless (not makeKeyAndOrderFront) to avoid stealing focus
+        #expect(mockWindow.orderFrontRegardlessCalled == true)
         #expect(mockWindow.isVisible == true)
     }
 
@@ -149,9 +157,9 @@ struct WindowManagerTests {
         #expect(manager.panelWindow == nil)
     }
 
-    // MARK: - activateApp Tests
+    // MARK: - Focus Behavior Tests
 
-    @Test func togglePanelCallsActivateAppWhenOpening() async throws {
+    @Test func togglePanelDoesNotActivateAppWhenOpening() async throws {
         var activateCalled = false
         let manager = WindowManager(
             notificationCenter: .default,
@@ -163,6 +171,37 @@ struct WindowManagerTests {
         manager.registerWindow(mockWindow)
         manager.togglePanel()
 
+        // Should NOT activate app - allows source app to keep focus for text capture
+        #expect(activateCalled == false)
+    }
+
+    @Test func focusPanelActivatesAppAndMakesWindowKey() async throws {
+        var activateCalled = false
+        let manager = WindowManager(
+            notificationCenter: .default,
+            activateApp: { activateCalled = true }
+        )
+        let mockWindow = MockWindow()
+
+        manager.registerWindow(mockWindow)
+        manager.focusPanel()
+
+        // Should activate app AND make window key
         #expect(activateCalled == true)
+        #expect(mockWindow.makeKeyAndOrderFrontCalled == true)
+    }
+
+    @Test func focusPanelDoesNothingWhenNoWindow() async throws {
+        var activateCalled = false
+        let manager = WindowManager(
+            notificationCenter: .default,
+            activateApp: { activateCalled = true }
+        )
+
+        manager.reset()
+        manager.focusPanel()
+
+        // Should not activate app when no window
+        #expect(activateCalled == false)
     }
 }

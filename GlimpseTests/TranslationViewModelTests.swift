@@ -86,4 +86,55 @@ struct TranslationViewModelTests {
         // Should be cleared after consumption
         #expect(viewModel.capturedText == nil)
     }
+
+    // MARK: - prepareForNewCapture Tests
+
+    @Test func prepareForNewCaptureClearsTextAndSetsCapturing() async throws {
+        let viewModel = TranslationViewModel.shared
+
+        // Set up existing state
+        viewModel.capturedText = "Previous text"
+        viewModel.isCapturingText = false
+
+        // Prepare for new capture
+        viewModel.prepareForNewCapture()
+
+        // Should clear text and set capturing flag
+        #expect(viewModel.capturedText == nil)
+        #expect(viewModel.isCapturingText == true)
+    }
+
+    @Test func finishCaptureClearsCapturingFlag() async throws {
+        let viewModel = TranslationViewModel.shared
+
+        // Set capturing state
+        viewModel.isCapturingText = true
+
+        // Finish capture
+        viewModel.finishCapture()
+
+        // Should clear capturing flag
+        #expect(viewModel.isCapturingText == false)
+    }
+
+    @Test func captureLifecycleWorksCorrectly() async throws {
+        let viewModel = TranslationViewModel.shared
+
+        // Initial state
+        viewModel.capturedText = "Old text"
+        viewModel.isCapturingText = false
+
+        // Start capture
+        viewModel.prepareForNewCapture()
+        #expect(viewModel.isCapturingText == true)
+        #expect(viewModel.capturedText == nil)
+
+        // Simulate text capture
+        viewModel.capturedText = "New captured text"
+
+        // Finish capture
+        viewModel.finishCapture()
+        #expect(viewModel.isCapturingText == false)
+        #expect(viewModel.capturedText == "New captured text")
+    }
 }

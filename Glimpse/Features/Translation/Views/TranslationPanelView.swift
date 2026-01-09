@@ -29,18 +29,33 @@ struct TranslationPanelView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            // Input text field
-            TextField("Enter text to translate...", text: $inputText, axis: .vertical)
-                .textFieldStyle(.plain)
-                .font(.system(size: 18))
-                .lineLimit(1...5)
-                .focused($isInputFocused)
-                .padding(12)
-                .background(Color(nsColor: .textBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .onSubmit {
-                    triggerTranslation()
+            // Input text field with loading overlay
+            ZStack(alignment: .leading) {
+                TextField("Enter text to translate...", text: $inputText, axis: .vertical)
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 18))
+                    .lineLimit(1...5)
+                    .focused($isInputFocused)
+                    .opacity(TranslationViewModel.shared.isCapturingText && inputText.isEmpty ? 0.3 : 1)
+                    .onSubmit {
+                        triggerTranslation()
+                    }
+
+                // Show subtle loading indicator while capturing text
+                if TranslationViewModel.shared.isCapturingText && inputText.isEmpty {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                            .scaleEffect(0.6)
+                        Text("Capturing text...")
+                            .foregroundStyle(.secondary)
+                            .font(.system(size: 14))
+                    }
+                    .padding(.leading, 4)
                 }
+            }
+            .padding(12)
+            .background(Color(nsColor: .textBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
 
             // Translation result or error
             if !translatedText.isEmpty || isTranslating || translationError != nil {
@@ -92,11 +107,23 @@ struct TranslationPanelView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
         .onAppear {
-            // Populate input with captured text if available
+            // Reset ALL state for fresh start on each panel open
+            inputText = ""
+            translatedText = ""
+            translationError = nil
+            translationConfiguration = nil
+
+            // Populate input with captured text if already available (race condition handling)
             if let capturedText = TranslationViewModel.shared.consumeCapturedText() {
                 inputText = capturedText
             }
             isInputFocused = true
+        }
+        .onChange(of: TranslationViewModel.shared.capturedText) { _, newValue in
+            // Handle late-arriving captured text (async text capture)
+            if newValue != nil, let text = TranslationViewModel.shared.consumeCapturedText() {
+                inputText = text
+            }
         }
         .translationTask(translationConfiguration) { @Sendable session in
             // Capture the text before crossing isolation boundary

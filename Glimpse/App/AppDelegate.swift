@@ -69,14 +69,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func handleHotkeyTriggered() {
         logger.debug("Hotkey triggered")
 
-        Task {
-            // Capture selected text from the frontmost application before opening the panel
-            if let selectedText = await AccessibilityService.shared.getSelectedText() {
-                TranslationViewModel.shared.capturedText = selectedText
-                logger.debug("Captured text for translation: \(selectedText.prefix(50))...")
-            }
+        // Prepare for new capture (clears previous state, signals loading)
+        TranslationViewModel.shared.prepareForNewCapture()
 
-            WindowManager.shared.togglePanel()
+        // Open panel IMMEDIATELY for instant feedback (no focus steal yet)
+        WindowManager.shared.togglePanel()
+
+        // Capture text, THEN transfer focus to panel
+        Task {
+            // Source app still focused here - accessibility APIs work!
+            let selectedText = await AccessibilityService.shared.getSelectedText()
+
+            // Capture complete - NOW make panel the key window
+            WindowManager.shared.focusPanel()
+
+            if let text = selectedText {
+                TranslationViewModel.shared.capturedText = text
+                logger.debug("Captured text for translation: \(text.prefix(50))...")
+            }
+            TranslationViewModel.shared.finishCapture()
         }
     }
 }
