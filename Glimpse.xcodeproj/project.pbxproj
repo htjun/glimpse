@@ -112,6 +112,7 @@
 			);
 			name = Glimpse;
 			packageProductDependencies = (
+				E9EBFA192F10730900D6CA79 /* KeyboardShortcuts */,
 			);
 			productName = Glimpse;
 			productReference = E9EBF9ED2F10730700D6CA79 /* Glimpse.app */;
@@ -195,6 +196,9 @@
 			);
 			mainGroup = E9EBF9E42F10730600D6CA79;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E9EBF9EE2F10730700D6CA79 /* Products */;
 			projectDirPath = "";
@@ -394,14 +398,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Glimpse/Glimpse.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Glimpse/Resources/Glimpse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PUBLICTEAMID;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Glimpse/Resources/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -412,7 +417,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -421,14 +427,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Glimpse/Glimpse.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Glimpse/Resources/Glimpse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PUBLICTEAMID;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Glimpse/Resources/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -439,7 +446,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -456,7 +464,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glimpse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Glimpse";
 			};
 			name = Debug;
@@ -474,7 +482,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Glimpse.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Glimpse";
 			};
 			name = Release;
@@ -490,7 +498,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Glimpse;
 			};
 			name = Debug;
@@ -506,7 +514,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = Glimpse;
 			};
 			name = Release;
@@ -551,6 +559,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E9EBFA192F10730900D6CA79 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E9EBF9E52F10730600D6CA79 /* Project object */;
 }

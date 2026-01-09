@@ -1,0 +1,107 @@
+# SwiftFormat Configuration for Glimpse
+# Modern Swift 6.0 / macOS 15+ configuration
+
+# Swift version
+--swiftversion 6.0
+
+# File options
+--exclude DerivedData,.build,.swiftpm,Pods,Carthage
+
+# Indentation
+--indent 4
+--tabwidth 4
+--smarttabs enabled
+--indentcase false
+--ifdef indent
+
+# Wrapping
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--wrapconditions after-first
+--wrapreturntype if-multiline
+--wrapeffects if-multiline
+--wraptypealiases before-first
+--closingparen balanced
+--maxwidth 120
+
+# Spacing
+--operatorfunc spaced
+--nospaceoperators ..<,...
+--ranges spaced
+--typeattributes prev-line
+--varattributes same-line
+--storedvarattrs same-line
+--computedvarattrs same-line
+--complexattrs prev-line
+--funcattributes prev-line
+
+# Braces
+--allman false
+--elseposition same-line
+--guardelse same-line
+
+# Blank lines
+--emptybraces no-space
+--trimwhitespace always
+
+# Semicolons
+--semicolons never
+
+# Imports
+--importgrouping alpha
+
+# Self
+--self remove
+--selfrequired
+
+# Redundancy
+--redundanttype inferred
+--stripunusedargs closure-only
+
+# Explicit types
+--inferredtypes always
+
+# Void
+--voidtype void
+
+# Headers (file headers handled by SwiftLint)
+--header ignore
+
+# Modern patterns
+--asynccapturing
+--someany true
+
+# Organization
+--organizetypes actor,class,enum,struct,extension,protocol
+--organizationmode visibility
+--extensionacl on-declarations
+
+# Marks
+--marktypes always
+--markextensions always
+--markcategories true
+--categorymark "MARK: - %c"
+--extensionmark "MARK: - %t + %c"
+--groupedextension "MARK: %c"
+
+# Acronyms
+--acronyms ID,URL,UUID,API,HTTP,HTTPS,JSON,XML,HTML,UI,AX
+
+# Enabled rules (default + extras)
+--enable blankLinesBetweenImports
+--enable blankLinesBetweenChainedFunctions
+--enable blockComments
+--enable docComments
+--enable isEmpty
+--enable markTypes
+--enable organizeDeclarations
+--enable sortSwitchCases
+--enable wrapConditionalBodies
+--enable wrapEnumCases
+--enable wrapMultilineStatementBraces
+--enable wrapSwitchCases
+
+# Disabled rules
+--disable trailingCommas
+--disable wrapAttributes
