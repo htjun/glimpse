@@ -80,6 +80,10 @@ struct TranslationPanelView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
         .onAppear {
+            // Populate input with captured text if available
+            if let capturedText = TranslationViewModel.shared.consumeCapturedText() {
+                inputText = capturedText
+            }
             isInputFocused = true
         }
     }

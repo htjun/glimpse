@@ -68,6 +68,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func handleHotkeyTriggered() {
         logger.debug("Hotkey triggered")
-        WindowManager.shared.togglePanel()
+
+        Task {
+            // Capture selected text from the frontmost application before opening the panel
+            if let selectedText = await AccessibilityService.shared.getSelectedText() {
+                TranslationViewModel.shared.capturedText = selectedText
+                logger.debug("Captured text for translation: \(selectedText.prefix(50))...")
+            }
+
+            WindowManager.shared.togglePanel()
+        }
     }
 }
