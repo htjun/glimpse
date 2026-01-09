@@ -113,10 +113,14 @@ final class AccessibilityService {
             &focusedElement
         )
 
-        guard result == .success, let element = focusedElement else {
+        guard result == .success,
+              let element = focusedElement,
+              CFGetTypeID(element) == AXUIElementGetTypeID() else {
             return nil
         }
 
+        // Safe: we verified the CFTypeID matches AXUIElement
+        // swiftlint:disable:next force_cast
         return getSelectedTextFromElement(element as! AXUIElement)
     }
 
@@ -128,11 +132,15 @@ final class AccessibilityService {
             &focusedElement
         )
 
-        guard result == .success, let element = focusedElement else {
+        guard result == .success,
+              let element = focusedElement,
+              CFGetTypeID(element) == AXUIElementGetTypeID() else {
             logger.debug("Could not get focused element from \(appName)")
             return nil
         }
 
+        // Safe: we verified the CFTypeID matches AXUIElement
+        // swiftlint:disable:next force_cast
         return getSelectedTextFromElement(element as! AXUIElement)
     }
 
