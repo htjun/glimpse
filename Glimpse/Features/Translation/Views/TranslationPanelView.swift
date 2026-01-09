@@ -5,6 +5,7 @@
 //  Created by Glimpse Contributors on 9/1/2026.
 //
 
+import AppKit
 import SwiftUI
 
 /// Main translation panel view - floating window activated by hotkey.
@@ -56,6 +57,13 @@ struct TranslationPanelView: View {
 
             // Action buttons
             HStack {
+                // Hidden escape button to capture Escape key
+                Button("") {
+                    dismiss()
+                }
+                .keyboardShortcut(.escape, modifiers: [])
+                .hidden()
+
                 Spacer()
 
                 Button("Translate") {
@@ -68,13 +76,11 @@ struct TranslationPanelView: View {
         .padding(20)
         .frame(width: 480, alignment: .top)
         .background(.ultraThinMaterial)
+        .background(WindowAccessor())
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
         .onAppear {
             isInputFocused = true
-        }
-        .onExitCommand {
-            dismiss()
         }
     }
 
@@ -99,4 +105,25 @@ struct TranslationPanelView: View {
 
 #Preview {
     TranslationPanelView()
+}
+
+// MARK: - Window Accessor
+
+/// Custom NSView that captures window reference when added to hierarchy.
+private class WindowCaptureView: NSView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if let window {
+            WindowManager.shared.registerPanelWindow(window)
+        }
+    }
+}
+
+/// Captures the NSWindow reference and registers it with WindowManager.
+private struct WindowAccessor: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        WindowCaptureView(frame: .zero)
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }

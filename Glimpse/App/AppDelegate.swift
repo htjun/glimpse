@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import KeyboardShortcuts
 import os.log
 
 /// Application delegate for handling app lifecycle events and global hotkey registration.
@@ -57,7 +58,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func registerGlobalHotkey() {
-        // TODO: Implement with KeyboardShortcuts package
-        logger.info("Global hotkey registration pending - KeyboardShortcuts package required")
+        KeyboardShortcuts.onKeyUp(for: .toggleTranslationPanel) { [weak self] in
+            Task { @MainActor in
+                self?.handleHotkeyTriggered()
+            }
+        }
+        logger.info("Global hotkey registered: toggleTranslationPanel")
+    }
+
+    private func handleHotkeyTriggered() {
+        logger.debug("Hotkey triggered")
+        WindowManager.shared.togglePanel()
     }
 }
