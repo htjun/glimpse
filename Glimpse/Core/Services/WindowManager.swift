@@ -18,21 +18,25 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     // MARK: - Properties
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Glimpse", category: "WindowManager")
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "Glimpse",
+        category: "WindowManager"
+    )
 
-    /// Stored reference to the panel window (set by TranslationPanelView via WindowAccessor)
-    private(set) var panelWindow: NSWindow?
-
-    /// Internal window reference using protocol for testability
+    /// Window reference using protocol for testability.
+    /// When registered as NSWindow, also stored in panelWindow for delegate access.
     private(set) var window: (any WindowProtocol)?
 
-    /// Tracks the intended panel state
+    /// Concrete NSWindow reference for delegate functionality.
+    private(set) var panelWindow: NSWindow?
+
+    /// Tracks the intended panel state.
     private(set) var isPanelIntendedOpen: Bool = false
 
-    /// Notification center (injectable for testing)
+    /// Notification center (injectable for testing).
     var notificationCenter: NotificationCenter = .default
 
-    /// Application activator (injectable for testing)
+    /// Application activator (injectable for testing).
     var activateApp: () -> Void = {
         NSApplication.shared.activate(ignoringOtherApps: true)
     }
@@ -43,8 +47,11 @@ final class WindowManager: NSObject, NSWindowDelegate {
         super.init()
     }
 
-    /// Internal initializer for testing
-    init(notificationCenter: NotificationCenter = .default, activateApp: @escaping () -> Void = { NSApplication.shared.activate(ignoringOtherApps: true) }) {
+    /// Internal initializer for testing.
+    init(
+        notificationCenter: NotificationCenter = .default,
+        activateApp: @escaping () -> Void = { NSApplication.shared.activate(ignoringOtherApps: true) }
+    ) {
         super.init()
         self.notificationCenter = notificationCenter
         self.activateApp = activateApp
@@ -53,7 +60,6 @@ final class WindowManager: NSObject, NSWindowDelegate {
     // MARK: - Public Methods
 
     /// Register the panel window reference.
-    /// When an NSWindow is provided, it also becomes the delegate.
     func registerWindow(_ window: any WindowProtocol) {
         self.window = window
         if let nsWindow = window as? NSWindow {
@@ -64,7 +70,6 @@ final class WindowManager: NSObject, NSWindowDelegate {
     }
 
     /// Toggle the translation panel visibility.
-    /// Returns true if panel was opened, false if closed.
     @discardableResult
     func togglePanel() -> Bool {
         if isPanelIntendedOpen {
@@ -81,31 +86,13 @@ final class WindowManager: NSObject, NSWindowDelegate {
         isPanelIntendedOpen = true
         activateApp()
 
-        logger.info("openPanel called - window exists: \(self.window != nil)")
-
-        if let window = window {
+        if let window {
             window.makeKeyAndOrderFront(nil)
-            logger.info("Panel opened with existing window")
-
-            // Window already exists - view is subscribed, post notification directly
-            let capturedText = TranslationViewModel.shared.capturedText
-            logger.info("Captured text before consume: \(capturedText ?? "nil")")
-
-            if let text = TranslationViewModel.shared.consumeCapturedText() {
-                notificationCenter.post(
-                    name: .didCapturePanelText,
-                    object: nil,
-                    userInfo: ["text": text]
-                )
-                logger.info("Posted .didCapturePanelText notification with text: \(text.prefix(30))...")
-            } else {
-                logger.info("No captured text to consume")
-            }
+            postCapturedTextNotificationIfNeeded()
         } else {
             notificationCenter.post(name: .shouldOpenTranslationPanel, object: nil)
-            logger.info("Posted .shouldOpenTranslationPanel (window not yet created)")
-            // Don't consume text here - onAppear will handle it for first launch
         }
+        logger.info("Panel opened, window exists: \(self.window != nil)")
     }
 
     /// Closes the panel.
@@ -115,24 +102,27 @@ final class WindowManager: NSObject, NSWindowDelegate {
         logger.debug("Panel closed")
     }
 
-    /// Reset state (for testing)
+    /// Reset state (for testing).
     func reset() {
-        panelWindow = nil
         window = nil
+        panelWindow = nil
         isPanelIntendedOpen = false
+    }
+
+    // MARK: - Private Methods
+
+    private func postCapturedTextNotificationIfNeeded() {
+        guard let text = TranslationViewModel.shared.consumeCapturedText() else { return }
+        notificationCenter.post(
+            name: .didCapturePanelText,
+            object: nil,
+            userInfo: ["text": text]
+        )
     }
 
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
         isPanelIntendedOpen = false
-        logger.info("windowWillClose - panel closed via delegate")
-    }
-
-    func windowDidBecomeKey(_ notification: Notification) {
-        // Text consumption is now handled by:
-        // - onAppear in TranslationPanelView (first launch)
-        // - openPanel() (subsequent launches when window exists)
-        logger.info("windowDidBecomeKey fired")
     }
 }

@@ -16,22 +16,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Constants
 
-    /// String value of kAXTrustedCheckOptionPrompt constant
     private static let accessibilityPromptKey = "AXTrustedCheckOptionPrompt"
 
     // MARK: - Properties
 
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Glimpse", category: "AppDelegate")
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "Glimpse",
+        category: "AppDelegate"
+    )
 
     // MARK: - NSApplicationDelegate
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        logger.info("Glimpse launched successfully")
-
-        // Check and request accessibility permissions
+        logger.info("Glimpse launched")
         checkAccessibilityPermissions()
-
-        // Register global hotkey (will be implemented with KeyboardShortcuts)
         registerGlobalHotkey()
     }
 
@@ -40,26 +38,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        // Keep app running in background even when all windows are closed
         false
     }
 
     // MARK: - Private Methods
 
     private func checkAccessibilityPermissions() {
-        // Skip prompting during UI tests to prevent blocking dialogs
-        let isRunningUITests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-        let options: [String: Bool] = [Self.accessibilityPromptKey: !isRunningUITests]
-        let accessibilityEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
+        let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        let options: [String: Bool] = [Self.accessibilityPromptKey: !isRunningTests]
+        let hasPermission = AXIsProcessTrustedWithOptions(options as CFDictionary)
 
-        if accessibilityEnabled {
+        if hasPermission {
             logger.info("Accessibility permissions granted")
+        } else if isRunningTests {
+            logger.info("Accessibility prompt skipped during tests")
         } else {
-            if isRunningUITests {
-                logger.info("Accessibility prompt skipped during UI tests")
-            } else {
-                logger.warning("Accessibility permissions not granted - selected text capture will be unavailable")
-            }
+            logger.warning("Accessibility permissions not granted")
         }
     }
 
@@ -69,32 +63,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.handleHotkeyTriggered()
             }
         }
-        logger.info("Global hotkey registered: toggleTranslationPanel")
+        logger.info("Global hotkey registered")
     }
 
     private func handleHotkeyTriggered() {
-        logger.info("Hotkey triggered - isPanelIntendedOpen: \(WindowManager.shared.isPanelIntendedOpen)")
-
-        // If panel is open, just close it
         if WindowManager.shared.isPanelIntendedOpen {
             WindowManager.shared.closePanel()
-            logger.info("Panel closed via toggle")
             return
         }
 
-        // Capture text THEN open panel
         Task {
-            logger.info("Starting text capture...")
             let capturedText = await AccessibilityService.shared.captureSelectedText()
-
             if let text = capturedText, !text.isEmpty {
                 TranslationViewModel.shared.capturedText = text
-                logger.info("Set capturedText in ViewModel: \(text.prefix(50))...")
-            } else {
-                logger.info("No text captured (nil or empty)")
             }
-
-            logger.info("Calling WindowManager.openPanel()")
             WindowManager.shared.openPanel()
         }
     }
