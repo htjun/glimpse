@@ -18,19 +18,11 @@
 			remoteGlobalIDString = E9EBF9EC2F10730600D6CA79;
 			remoteInfo = Glimpse;
 		};
-		E9EBFA062F10730800D6CA79 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9EBF9E52F10730600D6CA79 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E9EBF9EC2F10730600D6CA79;
-			remoteInfo = Glimpse;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		E9EBF9ED2F10730700D6CA79 /* Glimpse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Glimpse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9EBF9FB2F10730800D6CA79 /* GlimpseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlimpseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E9EBFA052F10730800D6CA79 /* GlimpseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GlimpseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -42,11 +34,6 @@
 		E9EBF9FE2F10730800D6CA79 /* GlimpseTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = GlimpseTests;
-			sourceTree = "<group>";
-		};
-		E9EBFA082F10730800D6CA79 /* GlimpseUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GlimpseUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -67,13 +54,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E9EBFA022F10730800D6CA79 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -82,7 +62,6 @@
 			children = (
 				E9EBF9EF2F10730700D6CA79 /* Glimpse */,
 				E9EBF9FE2F10730800D6CA79 /* GlimpseTests */,
-				E9EBFA082F10730800D6CA79 /* GlimpseUITests */,
 				E9EBF9EE2F10730700D6CA79 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -92,7 +71,6 @@
 			children = (
 				E9EBF9ED2F10730700D6CA79 /* Glimpse.app */,
 				E9EBF9FB2F10730800D6CA79 /* GlimpseTests.xctest */,
-				E9EBFA052F10730800D6CA79 /* GlimpseUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -146,29 +124,6 @@
 			productReference = E9EBF9FB2F10730800D6CA79 /* GlimpseTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		E9EBFA042F10730800D6CA79 /* GlimpseUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E9EBFA152F10730800D6CA79 /* Build configuration list for PBXNativeTarget "GlimpseUITests" */;
-			buildPhases = (
-				E9EBFA012F10730800D6CA79 /* Sources */,
-				E9EBFA022F10730800D6CA79 /* Frameworks */,
-				E9EBFA032F10730800D6CA79 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E9EBFA072F10730800D6CA79 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				E9EBFA082F10730800D6CA79 /* GlimpseUITests */,
-			);
-			name = GlimpseUITests;
-			packageProductDependencies = (
-			);
-			productName = GlimpseUITests;
-			productReference = E9EBFA052F10730800D6CA79 /* GlimpseUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -183,10 +138,6 @@
 						CreatedOnToolsVersion = 16.4;
 					};
 					E9EBF9FA2F10730800D6CA79 = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = E9EBF9EC2F10730600D6CA79;
-					};
-					E9EBFA042F10730800D6CA79 = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = E9EBF9EC2F10730600D6CA79;
 					};
@@ -211,7 +162,6 @@
 			targets = (
 				E9EBF9EC2F10730600D6CA79 /* Glimpse */,
 				E9EBF9FA2F10730800D6CA79 /* GlimpseTests */,
-				E9EBFA042F10730800D6CA79 /* GlimpseUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -225,13 +175,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E9EBF9F92F10730800D6CA79 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E9EBFA032F10730800D6CA79 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -255,13 +198,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E9EBFA012F10730800D6CA79 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -269,11 +205,6 @@
 			isa = PBXTargetDependency;
 			target = E9EBF9EC2F10730600D6CA79 /* Glimpse */;
 			targetProxy = E9EBF9FC2F10730800D6CA79 /* PBXContainerItemProxy */;
-		};
-		E9EBFA072F10730800D6CA79 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E9EBF9EC2F10730600D6CA79 /* Glimpse */;
-			targetProxy = E9EBFA062F10730800D6CA79 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -492,38 +423,6 @@
 			};
 			name = Release;
 		};
-		E9EBFA162F10730800D6CA79 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PUBLICTEAMID;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 6.0;
-				TEST_TARGET_NAME = Glimpse;
-			};
-			name = Debug;
-		};
-		E9EBFA172F10730800D6CA79 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PUBLICTEAMID;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.htjun.GlimpseUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 6.0;
-				TEST_TARGET_NAME = Glimpse;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -550,15 +449,6 @@
 			buildConfigurations = (
 				E9EBFA132F10730800D6CA79 /* Debug */,
 				E9EBFA142F10730800D6CA79 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E9EBFA152F10730800D6CA79 /* Build configuration list for PBXNativeTarget "GlimpseUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E9EBFA162F10730800D6CA79 /* Debug */,
-				E9EBFA172F10730800D6CA79 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
