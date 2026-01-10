@@ -75,19 +75,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func handleHotkeyTriggered() {
         logger.debug("Hotkey triggered")
 
+        // Toggle panel and get session ID (nil means we're closing)
+        guard let sessionID = WindowManager.shared.togglePanel() else {
+            // User closed the panel - no text capture needed
+            logger.debug("Panel closed via toggle")
+            return
+        }
+
         // Prepare for new capture (clears previous state, signals loading)
         TranslationViewModel.shared.prepareForNewCapture()
-
-        // Open panel IMMEDIATELY for instant feedback (no focus steal yet)
-        WindowManager.shared.togglePanel()
 
         // Capture text, THEN transfer focus to panel
         Task {
             // Source app still focused here - accessibility APIs work!
             let selectedText = await AccessibilityService.shared.getSelectedText()
 
-            // Capture complete - NOW make panel the key window
-            WindowManager.shared.focusPanel()
+            // Only focus if this session is still valid (panel wasn't closed)
+            guard WindowManager.shared.focusPanelIfValid(sessionID: sessionID) else {
+                logger.debug("Capture completed but panel was closed - discarding")
+                return
+            }
 
             if let text = selectedText {
                 TranslationViewModel.shared.capturedText = text

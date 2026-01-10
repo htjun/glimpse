@@ -26,6 +26,12 @@ final class WindowManager {
     /// Internal window reference using protocol for testability
     private(set) var window: (any WindowProtocol)?
 
+    /// Tracks the intended panel state (survives async operations)
+    private(set) var isPanelIntendedOpen: Bool = false
+
+    /// Session ID for the current capture operation (used to invalidate stale completions)
+    private(set) var currentCaptureSessionID: UUID?
+
     /// Notification center (injectable for testing)
     var notificationCenter: NotificationCenter = .default
 
@@ -62,29 +68,70 @@ final class WindowManager {
         logger.debug("Panel window registered")
     }
 
-    /// Toggle the translation panel visibility
-    func togglePanel() {
-        if let window = window {
-            if window.isVisible {
-                closePanel(window: window)
-            } else {
-                openPanel(window: window)
-            }
+    /// Toggle the translation panel visibility.
+    /// Returns a session ID if opening (for validating async completions), nil if closing.
+    @discardableResult
+    func togglePanel() -> UUID? {
+        if isPanelIntendedOpen {
+            // User wants to close
+            closePanelWithIntent()
+            return nil
         } else {
-            // Window not created yet - post notification for SwiftUI to handle
-            notificationCenter.post(name: .shouldOpenTranslationPanel, object: nil)
-            logger.debug("Posted notification to open panel (window not yet created)")
+            // User wants to open
+            return openPanelForCapture()
         }
     }
 
-    /// Close the panel if open
-    func closePanel() {
+    /// Opens the panel and sets intent to open. Returns a session ID for this capture.
+    func openPanelForCapture() -> UUID {
+        let sessionID = UUID()
+        currentCaptureSessionID = sessionID
+        isPanelIntendedOpen = true
+
+        if let window = window {
+            openPanel(window: window)
+        } else {
+            notificationCenter.post(name: .shouldOpenTranslationPanel, object: nil)
+            logger.debug("Posted notification to open panel (window not yet created)")
+        }
+
+        return sessionID
+    }
+
+    /// Closes the panel and sets intent to closed. Invalidates any pending capture.
+    func closePanelWithIntent() {
+        isPanelIntendedOpen = false
+        currentCaptureSessionID = nil
+
         if let window = window {
             closePanel(window: window)
         }
     }
 
-    /// Transfer focus to the panel (makes it the key window)
+    /// Close the panel if open (updates intent state)
+    func closePanel() {
+        closePanelWithIntent()
+    }
+
+    /// Transfer focus to the panel (makes it the key window).
+    /// Only applies focus if the session is still valid.
+    /// Returns true if focus was applied, false if the request was stale.
+    @discardableResult
+    func focusPanelIfValid(sessionID: UUID) -> Bool {
+        guard isPanelIntendedOpen, currentCaptureSessionID == sessionID else {
+            logger.debug("Ignoring stale focus request (session invalidated)")
+            return false
+        }
+
+        if let window = window {
+            activateApp()
+            window.makeKeyAndOrderFront(nil)
+            logger.debug("Panel focused (made key window)")
+        }
+        return true
+    }
+
+    /// Transfer focus to the panel unconditionally (legacy method, prefer focusPanelIfValid)
     func focusPanel() {
         if let window = window {
             activateApp()
@@ -97,6 +144,8 @@ final class WindowManager {
     func reset() {
         panelWindow = nil
         window = nil
+        isPanelIntendedOpen = false
+        currentCaptureSessionID = nil
     }
 
     // MARK: - Private Methods
