@@ -21,10 +21,6 @@ final class TranslationViewModel {
     /// Set by AppDelegate before opening the panel, consumed by TranslationPanelView.
     var capturedText: String?
 
-    /// Indicates whether text capture is currently in progress.
-    /// Used by TranslationPanelView to show a loading indicator.
-    var isCapturingText: Bool = false
-
     // MARK: - Initialization
 
     private init() {}
@@ -37,17 +33,5 @@ final class TranslationViewModel {
         let text = capturedText
         capturedText = nil
         return text
-    }
-
-    /// Prepares for a new text capture cycle.
-    /// Clears any previous captured text and signals that capture is in progress.
-    func prepareForNewCapture() {
-        capturedText = nil
-        isCapturingText = true
-    }
-
-    /// Marks text capture as complete.
-    func finishCapture() {
-        isCapturingText = false
     }
 }

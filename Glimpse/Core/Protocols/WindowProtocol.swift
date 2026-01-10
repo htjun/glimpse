@@ -12,7 +12,6 @@ import AppKit
 protocol WindowProtocol: AnyObject {
     var isVisible: Bool { get }
     func makeKeyAndOrderFront(_ sender: Any?)
-    func orderFrontRegardless()
     func close()
 }
 
