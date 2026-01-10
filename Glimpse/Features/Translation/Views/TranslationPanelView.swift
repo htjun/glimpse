@@ -29,10 +29,8 @@ struct TranslationPanelView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            // Scrollable content area with max height
             ScrollView {
                 VStack(spacing: 16) {
-                    // Input text field
                     TextField("Enter text to translate...", text: $inputText, axis: .vertical)
                         .textFieldStyle(.plain)
                         .font(.system(size: 18))
@@ -45,7 +43,6 @@ struct TranslationPanelView: View {
                         .background(Color(nsColor: .textBackgroundColor))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
 
-                    // Translation result or error
                     if !translatedText.isEmpty || isTranslating || translationError != nil {
                         Divider()
 
@@ -75,9 +72,7 @@ struct TranslationPanelView: View {
             .frame(maxHeight: 600)
             .scrollBounceBehavior(.basedOnSize)
 
-            // Action buttons (always visible outside scroll area)
             HStack {
-                // Hidden escape button to capture Escape key
                 Button("") {
                     dismiss()
                 }
@@ -100,15 +95,14 @@ struct TranslationPanelView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
         .onAppear {
-            // Reset state for fresh start on each panel open
-            inputText = ""
-            translatedText = ""
-            translationError = nil
-            translationConfiguration = nil
-
-            // Text is always ready (captured before panel opened)
-            if let text = TranslationViewModel.shared.consumeCapturedText() {
-                applyAndTranslate(text)
+            resetState()
+            isInputFocused = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .didCapturePanelText)) { notification in
+            resetState()
+            if let text = notification.userInfo?["text"] as? String {
+                inputText = text
+                triggerTranslation()
             }
             isInputFocused = true
         }
@@ -135,10 +129,12 @@ struct TranslationPanelView: View {
 
     // MARK: - Private Methods
 
-    /// Applies captured text to input and triggers translation.
-    private func applyAndTranslate(_ text: String) {
-        inputText = text
-        triggerTranslation()
+    /// Resets all state for a fresh panel open.
+    private func resetState() {
+        inputText = ""
+        translatedText = ""
+        translationError = nil
+        translationConfiguration = nil
     }
 
     /// Triggers translation by setting/invalidating the configuration.
@@ -174,7 +170,7 @@ private class WindowCaptureView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         if let window {
-            WindowManager.shared.registerPanelWindow(window)
+            WindowManager.shared.registerWindow(window)
         }
     }
 }

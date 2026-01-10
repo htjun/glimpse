@@ -10,7 +10,7 @@ import os.log
 
 /// Manages the translation panel window state.
 @MainActor
-final class WindowManager {
+final class WindowManager: NSObject, NSWindowDelegate {
 
     // MARK: - Singleton
 
@@ -39,28 +39,26 @@ final class WindowManager {
 
     // MARK: - Initialization
 
-    private init() {}
+    private override init() {
+        super.init()
+    }
 
     /// Internal initializer for testing
     init(notificationCenter: NotificationCenter = .default, activateApp: @escaping () -> Void = { NSApplication.shared.activate(ignoringOtherApps: true) }) {
+        super.init()
         self.notificationCenter = notificationCenter
         self.activateApp = activateApp
     }
 
     // MARK: - Public Methods
 
-    /// Register the panel window reference (called by TranslationPanelView)
-    func registerPanelWindow(_ window: NSWindow) {
-        panelWindow = window
-        self.window = window
-        logger.debug("Panel window registered")
-    }
-
-    /// Register a window using the protocol (for testing)
+    /// Register the panel window reference.
+    /// When an NSWindow is provided, it also becomes the delegate.
     func registerWindow(_ window: any WindowProtocol) {
         self.window = window
         if let nsWindow = window as? NSWindow {
             panelWindow = nsWindow
+            nsWindow.delegate = self
         }
         logger.debug("Panel window registered")
     }
@@ -104,5 +102,24 @@ final class WindowManager {
         panelWindow = nil
         window = nil
         isPanelIntendedOpen = false
+    }
+
+    // MARK: - NSWindowDelegate
+
+    func windowWillClose(_ notification: Notification) {
+        isPanelIntendedOpen = false
+        logger.debug("Panel closed (detected via delegate)")
+    }
+
+    func windowDidBecomeKey(_ notification: Notification) {
+        // Consume captured text and notify the panel
+        if let text = TranslationViewModel.shared.consumeCapturedText() {
+            notificationCenter.post(
+                name: .didCapturePanelText,
+                object: nil,
+                userInfo: ["text": text]
+            )
+        }
+        logger.debug("Panel became key")
     }
 }

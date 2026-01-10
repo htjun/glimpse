@@ -5,6 +5,7 @@
 //  Created by Glimpse Contributors on 9/1/2026.
 //
 
+import AppKit
 import Foundation
 import Testing
 @testable import Glimpse
@@ -32,6 +33,13 @@ final class MockWindow: WindowProtocol {
         makeKeyAndOrderFrontCalled = false
         closeCalled = false
     }
+
+    /// Simulates an external close (ESC, Cmd+W, etc.) by notifying the delegate
+    func simulateExternalClose(notifying delegate: NSWindowDelegate) {
+        isVisible = false
+        let notification = Notification(name: NSWindow.willCloseNotification, object: self)
+        delegate.windowWillClose?(notification)
+    }
 }
 
 // MARK: - Tests
@@ -42,11 +50,7 @@ struct WindowManagerTests {
     // MARK: - Setup
 
     private func createWindowManager() -> WindowManager {
-        let manager = WindowManager(
-            notificationCenter: .default,
-            activateApp: {}
-        )
-        return manager
+        WindowManager(notificationCenter: .default, activateApp: {})
     }
 
     // MARK: - registerWindow Tests
@@ -209,5 +213,45 @@ struct WindowManagerTests {
         #expect(manager.isPanelIntendedOpen == true)
 
         NotificationCenter.default.removeObserver(observer)
+    }
+
+    // MARK: - windowWillClose Tests
+
+    @Test func externalWindowCloseSyncsState() async throws {
+        let manager = createWindowManager()
+        let mockWindow = MockWindow()
+
+        manager.registerWindow(mockWindow)
+        manager.openPanel()
+        #expect(manager.isPanelIntendedOpen == true)
+
+        // Simulate external close (e.g., ESC key, Cmd+W)
+        mockWindow.simulateExternalClose(notifying: manager)
+
+        #expect(manager.isPanelIntendedOpen == false)
+    }
+
+    @Test func hotkeyToggleWorksAfterExternalClose() async throws {
+        let manager = createWindowManager()
+        let mockWindow = MockWindow()
+
+        manager.registerWindow(mockWindow)
+
+        // Open panel via toggle
+        let opened = manager.togglePanel()
+        #expect(opened == true)
+        #expect(manager.isPanelIntendedOpen == true)
+
+        // Simulate external close (e.g., ESC)
+        mockWindow.simulateExternalClose(notifying: manager)
+        #expect(manager.isPanelIntendedOpen == false)
+
+        mockWindow.reset()
+
+        // Toggle again should open, not close
+        let openedAgain = manager.togglePanel()
+        #expect(openedAgain == true)
+        #expect(mockWindow.makeKeyAndOrderFrontCalled == true)
+        #expect(manager.isPanelIntendedOpen == true)
     }
 }
