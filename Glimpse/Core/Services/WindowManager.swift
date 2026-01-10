@@ -81,12 +81,30 @@ final class WindowManager: NSObject, NSWindowDelegate {
         isPanelIntendedOpen = true
         activateApp()
 
+        logger.info("openPanel called - window exists: \(self.window != nil)")
+
         if let window = window {
             window.makeKeyAndOrderFront(nil)
-            logger.debug("Panel opened with focus")
+            logger.info("Panel opened with existing window")
+
+            // Window already exists - view is subscribed, post notification directly
+            let capturedText = TranslationViewModel.shared.capturedText
+            logger.info("Captured text before consume: \(capturedText ?? "nil")")
+
+            if let text = TranslationViewModel.shared.consumeCapturedText() {
+                notificationCenter.post(
+                    name: .didCapturePanelText,
+                    object: nil,
+                    userInfo: ["text": text]
+                )
+                logger.info("Posted .didCapturePanelText notification with text: \(text.prefix(30))...")
+            } else {
+                logger.info("No captured text to consume")
+            }
         } else {
             notificationCenter.post(name: .shouldOpenTranslationPanel, object: nil)
-            logger.debug("Posted notification to open panel (window not yet created)")
+            logger.info("Posted .shouldOpenTranslationPanel (window not yet created)")
+            // Don't consume text here - onAppear will handle it for first launch
         }
     }
 
@@ -108,18 +126,13 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         isPanelIntendedOpen = false
-        logger.debug("Panel closed (detected via delegate)")
+        logger.info("windowWillClose - panel closed via delegate")
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        // Consume captured text and notify the panel
-        if let text = TranslationViewModel.shared.consumeCapturedText() {
-            notificationCenter.post(
-                name: .didCapturePanelText,
-                object: nil,
-                userInfo: ["text": text]
-            )
-        }
-        logger.debug("Panel became key")
+        // Text consumption is now handled by:
+        // - onAppear in TranslationPanelView (first launch)
+        // - openPanel() (subsequent launches when window exists)
+        logger.info("windowDidBecomeKey fired")
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import os.log
 import SwiftUI
 import Translation
 
@@ -95,14 +96,32 @@ struct TranslationPanelView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
         .onAppear {
+            let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Glimpse", category: "TranslationPanelView")
+            logger.info("onAppear fired")
             resetState()
+            // Consume text directly for first launch (when view is created)
+            // Subsequent launches use notification from openPanel()
+            let capturedText = TranslationViewModel.shared.capturedText
+            logger.info("onAppear - captured text before consume: \(capturedText ?? "nil")")
+            if let text = TranslationViewModel.shared.consumeCapturedText() {
+                logger.info("onAppear - consumed text, triggering translation: \(text.prefix(30))...")
+                inputText = text
+                triggerTranslation()
+            } else {
+                logger.info("onAppear - no text to consume")
+            }
             isInputFocused = true
         }
         .onReceive(NotificationCenter.default.publisher(for: .didCapturePanelText)) { notification in
+            let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Glimpse", category: "TranslationPanelView")
+            logger.info("onReceive .didCapturePanelText fired")
             resetState()
             if let text = notification.userInfo?["text"] as? String {
+                logger.info("onReceive - received text, triggering translation: \(text.prefix(30))...")
                 inputText = text
                 triggerTranslation()
+            } else {
+                logger.info("onReceive - no text in notification userInfo")
             }
             isInputFocused = true
         }
@@ -134,7 +153,8 @@ struct TranslationPanelView: View {
         inputText = ""
         translatedText = ""
         translationError = nil
-        translationConfiguration = nil
+        isTranslating = false
+        // DON'T reset translationConfiguration - we use invalidate() to re-trigger
     }
 
     /// Triggers translation by setting/invalidating the configuration.

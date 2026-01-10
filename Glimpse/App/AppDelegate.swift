@@ -73,24 +73,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func handleHotkeyTriggered() {
-        logger.debug("Hotkey triggered")
+        logger.info("Hotkey triggered - isPanelIntendedOpen: \(WindowManager.shared.isPanelIntendedOpen)")
 
         // If panel is open, just close it
         if WindowManager.shared.isPanelIntendedOpen {
             WindowManager.shared.closePanel()
-            logger.debug("Panel closed via toggle")
+            logger.info("Panel closed via toggle")
             return
         }
 
         // Capture text THEN open panel
         Task {
+            logger.info("Starting text capture...")
             let capturedText = await AccessibilityService.shared.captureSelectedText()
 
             if let text = capturedText, !text.isEmpty {
                 TranslationViewModel.shared.capturedText = text
-                logger.debug("Captured text: \(text.prefix(50))...")
+                logger.info("Set capturedText in ViewModel: \(text.prefix(50))...")
+            } else {
+                logger.info("No text captured (nil or empty)")
             }
 
+            logger.info("Calling WindowManager.openPanel()")
             WindowManager.shared.openPanel()
         }
     }
