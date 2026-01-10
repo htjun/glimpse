@@ -39,6 +39,10 @@ struct GlimpseApp: App {
         .windowResizability(.contentSize)
         .windowStyle(.hiddenTitleBar)
         .defaultLaunchBehavior(.presented)
+
+        Settings {
+            SettingsView()
+        }
     }
 }
 

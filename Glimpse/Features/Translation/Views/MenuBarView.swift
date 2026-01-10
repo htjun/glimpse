@@ -24,10 +24,8 @@ struct MenuBarView: View {
 
         Divider()
 
-        Button("Settings...") {
-            // TODO: Open settings window
-        }
-        .keyboardShortcut(",", modifiers: .command)
+        SettingsLink(label: { Text("Settings...") })
+            .keyboardShortcut(",", modifiers: .command)
 
         Divider()
 
