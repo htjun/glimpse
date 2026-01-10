@@ -31,9 +31,13 @@ final class AccessibilityService {
     // MARK: - Public Methods
 
     /// Captures the currently selected text by simulating Cmd+C.
+    /// Preserves the user's original clipboard contents.
     /// - Returns: The selected text, or `nil` if no text is selected or capture fails.
     func captureSelectedText() async -> String? {
         let pasteboard = NSPasteboard.general
+
+        // Save current clipboard contents
+        let savedItems = saveClipboardContents()
         let originalChangeCount = pasteboard.changeCount
 
         // Simulate Cmd+C to copy selected text
@@ -42,12 +46,18 @@ final class AccessibilityService {
         // Wait for clipboard to update
         try? await Task.sleep(for: clipboardWaitTime)
 
-        // Check if clipboard changed
+        // Read captured text
+        var capturedText: String?
         if pasteboard.changeCount != originalChangeCount {
-            if let text = pasteboard.string(forType: .string), !text.isEmpty {
-                logger.debug("Captured text: \(text.prefix(50))...")
-                return text
-            }
+            capturedText = pasteboard.string(forType: .string)
+        }
+
+        // Restore original clipboard contents
+        restoreClipboardContents(savedItems)
+
+        if let text = capturedText, !text.isEmpty {
+            logger.debug("Captured text: \(text.prefix(50))...")
+            return text
         }
 
         logger.debug("No text captured (clipboard unchanged or empty)")
@@ -58,6 +68,50 @@ final class AccessibilityService {
     /// - Returns: `true` if the app has accessibility permissions.
     func hasAccessibilityPermissions() -> Bool {
         AXIsProcessTrusted()
+    }
+
+    // MARK: - Clipboard Save/Restore
+
+    private struct ClipboardItem {
+        let types: [NSPasteboard.PasteboardType]
+        let dataByType: [NSPasteboard.PasteboardType: Data]
+    }
+
+    private func saveClipboardContents() -> [ClipboardItem] {
+        let pasteboard = NSPasteboard.general
+        var items: [ClipboardItem] = []
+
+        for item in pasteboard.pasteboardItems ?? [] {
+            var dataByType: [NSPasteboard.PasteboardType: Data] = [:]
+            let types = item.types
+
+            for type in types {
+                if let data = item.data(forType: type) {
+                    dataByType[type] = data
+                }
+            }
+
+            if !dataByType.isEmpty {
+                items.append(ClipboardItem(types: types, dataByType: dataByType))
+            }
+        }
+
+        return items
+    }
+
+    private func restoreClipboardContents(_ items: [ClipboardItem]) {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+
+        for item in items {
+            let pasteboardItem = NSPasteboardItem()
+            for type in item.types {
+                if let data = item.dataByType[type] {
+                    pasteboardItem.setData(data, forType: type)
+                }
+            }
+            pasteboard.writeObjects([pasteboardItem])
+        }
     }
 
     // MARK: - Private Methods
