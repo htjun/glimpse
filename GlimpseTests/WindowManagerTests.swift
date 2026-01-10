@@ -209,7 +209,7 @@ struct WindowManagerTests {
         try await Task.sleep(for: .milliseconds(50))
 
         #expect(notificationReceived == true)
-        #expect(activateCalled == false) // No window, so app not activated directly
+        #expect(activateCalled == true) // App is always activated to ensure focus on first launch
         #expect(manager.isPanelIntendedOpen == true)
 
         NotificationCenter.default.removeObserver(observer)

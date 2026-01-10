@@ -79,9 +79,9 @@ final class WindowManager: NSObject, NSWindowDelegate {
     /// Opens the panel with focus.
     func openPanel() {
         isPanelIntendedOpen = true
+        activateApp()
 
         if let window = window {
-            activateApp()
             window.makeKeyAndOrderFront(nil)
             logger.debug("Panel opened with focus")
         } else {
