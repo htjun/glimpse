@@ -7,6 +7,7 @@
 
 import AppKit
 import os.log
+import SwiftUI
 
 /// Manages the translation panel window state.
 @MainActor
@@ -23,12 +24,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
         category: "WindowManager"
     )
 
-    /// Window reference using protocol for testability.
-    /// When registered as NSWindow, also stored in panelWindow for delegate access.
-    private(set) var window: (any WindowProtocol)?
-
-    /// Concrete NSWindow reference for delegate functionality.
-    private(set) var panelWindow: NSWindow?
+    /// The translation panel instance.
+    private(set) var panel: TranslationPanel?
 
     /// Tracks the intended panel state.
     private(set) var isPanelIntendedOpen: Bool = false
@@ -59,16 +56,6 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     // MARK: - Public Methods
 
-    /// Register the panel window reference.
-    func registerWindow(_ window: any WindowProtocol) {
-        self.window = window
-        if let nsWindow = window as? NSWindow {
-            panelWindow = nsWindow
-            nsWindow.delegate = self
-        }
-        logger.debug("Panel window registered")
-    }
-
     /// Toggle the translation panel visibility.
     @discardableResult
     func togglePanel() -> Bool {
@@ -86,37 +73,74 @@ final class WindowManager: NSObject, NSWindowDelegate {
         isPanelIntendedOpen = true
         activateApp()
 
-        if let window {
-            window.makeKeyAndOrderFront(nil)
-            postCapturedTextNotificationIfNeeded()
-        } else {
-            notificationCenter.post(name: .shouldOpenTranslationPanel, object: nil)
+        // Create panel lazily
+        if panel == nil {
+            createPanel()
         }
-        logger.info("Panel opened, window exists: \(self.window != nil)")
+
+        guard let panel else { return }
+
+        // Post notification before showing (includes captured text if available)
+        postPanelOpenNotification()
+
+        // Center and show panel
+        centerPanel()
+        panel.makeKeyAndOrderFront(nil)
+
+        logger.info("Panel opened")
     }
 
     /// Closes the panel.
     func closePanel() {
         isPanelIntendedOpen = false
-        window?.close()
+        panel?.orderOut(nil)
         logger.debug("Panel closed")
     }
 
     /// Reset state (for testing).
     func reset() {
-        window = nil
-        panelWindow = nil
+        panel?.close()
+        panel = nil
         isPanelIntendedOpen = false
     }
 
     // MARK: - Private Methods
 
-    private func postCapturedTextNotificationIfNeeded() {
-        guard let text = TranslationViewModel.shared.consumeCapturedText() else { return }
+    private func createPanel() {
+        let hostingView = NSHostingView(rootView: TranslationPanelView())
+        hostingView.setFrameSize(hostingView.fittingSize)
+
+        let newPanel = TranslationPanel(contentView: hostingView)
+        newPanel.delegate = self
+        panel = newPanel
+
+        logger.debug("Panel created")
+    }
+
+    private func centerPanel() {
+        guard let panel, let screen = NSScreen.main else { return }
+
+        let contentSize = panel.contentView?.fittingSize ?? CGSize(width: 480, height: 200)
+        panel.setContentSize(contentSize)
+
+        let screenFrame = screen.visibleFrame
+        let origin = NSPoint(
+            x: screenFrame.midX - contentSize.width / 2,
+            y: screenFrame.midY - contentSize.height / 2 + 100
+        )
+        panel.setFrameOrigin(origin)
+    }
+
+    private func postPanelOpenNotification() {
+        let capturedText = TranslationViewModel.shared.consumeCapturedText()
+        var userInfo: [String: Any] = [:]
+        if let text = capturedText {
+            userInfo["text"] = text
+        }
         notificationCenter.post(
             name: .didCapturePanelText,
             object: nil,
-            userInfo: ["text": text]
+            userInfo: userInfo.isEmpty ? nil : userInfo
         )
     }
 
