@@ -79,16 +79,25 @@ struct TranslationPanelView: View {
 
                 if !translatedText.isEmpty && !isTranslating {
                     Divider()
+                        .padding(.horizontal, 24)
                     footerSection
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                 }
             }
-        }
+            }
         .frame(width: 480, alignment: .top)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.15), radius: 30, x: 0, y: 15)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .background(
+            RoundedRectangle(cornerRadius: 24)
+                .fill(Color(red: 247 / 255, green: 247 / 255, blue: 244 / 255))
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .strokeBorder(Color(red: 222 / 255, green: 221 / 255, blue: 217 / 255), lineWidth: 1)
+        )
+        .padding(30)
         .onReceive(NotificationCenter.default.publisher(for: .didCapturePanelText)) { notification in
             let text = notification.userInfo?["text"] as? String
             handlePanelOpen(text: text)
