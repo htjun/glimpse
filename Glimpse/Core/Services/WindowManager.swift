@@ -73,17 +73,25 @@ final class WindowManager: NSObject, NSWindowDelegate {
         isPanelIntendedOpen = true
         activateApp()
 
-        // Create panel lazily
+        // Get captured text before creating view
+        let capturedText = TranslationViewModel.shared.consumeCapturedText()
+
+        // Always create fresh hosting view for correct sizing
+        let hostingView = NSHostingView(rootView: TranslationPanelView(capturedText: capturedText))
+
+        // Create panel if needed, otherwise update content
         if panel == nil {
-            createPanel()
+            let newPanel = TranslationPanel(contentView: hostingView)
+            newPanel.delegate = self
+            panel = newPanel
+            logger.debug("Panel created")
+        } else {
+            panel?.contentView = hostingView
         }
 
         guard let panel else { return }
 
-        // Post notification before showing (includes captured text if available)
-        postPanelOpenNotification()
-
-        // Center and show panel
+        // Size and show panel
         centerPanel()
         panel.makeKeyAndOrderFront(nil)
 
@@ -106,19 +114,14 @@ final class WindowManager: NSObject, NSWindowDelegate {
 
     // MARK: - Private Methods
 
-    private func createPanel() {
-        let hostingView = NSHostingView(rootView: TranslationPanelView())
-        hostingView.setFrameSize(hostingView.fittingSize)
-
-        let newPanel = TranslationPanel(contentView: hostingView)
-        newPanel.delegate = self
-        panel = newPanel
-
-        logger.debug("Panel created")
-    }
-
     private func centerPanel() {
         guard let panel, let screen = NSScreen.main else { return }
+
+        // Force layout recalculation before reading fittingSize
+        if let hostingView = panel.contentView as? NSHostingView<TranslationPanelView> {
+            hostingView.invalidateIntrinsicContentSize()
+            hostingView.layoutSubtreeIfNeeded()
+        }
 
         let contentSize = panel.contentView?.fittingSize ?? CGSize(width: 480, height: 200)
         panel.setContentSize(contentSize)
@@ -129,19 +132,6 @@ final class WindowManager: NSObject, NSWindowDelegate {
             y: screenFrame.midY - contentSize.height / 2 + 100
         )
         panel.setFrameOrigin(origin)
-    }
-
-    private func postPanelOpenNotification() {
-        let capturedText = TranslationViewModel.shared.consumeCapturedText()
-        var userInfo: [String: Any] = [:]
-        if let text = capturedText {
-            userInfo["text"] = text
-        }
-        notificationCenter.post(
-            name: .didCapturePanelText,
-            object: nil,
-            userInfo: userInfo.isEmpty ? nil : userInfo
-        )
     }
 
     // MARK: - NSWindowDelegate

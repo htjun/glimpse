@@ -20,6 +20,15 @@ struct TranslationPanelView: View {
         category: "TranslationPanelView"
     )
 
+    // MARK: - Initialization
+
+    /// Optional captured text to translate immediately on open.
+    private let initialText: String?
+
+    init(capturedText: String? = nil) {
+        self.initialText = capturedText
+    }
+
     // MARK: - Properties
 
     @State private var inputText: String = ""
@@ -79,9 +88,8 @@ struct TranslationPanelView: View {
             }
         }
         .panelStyle()
-        .onReceive(NotificationCenter.default.publisher(for: .didCapturePanelText)) { notification in
-            let text = notification.userInfo?["text"] as? String
-            handlePanelOpen(text: text)
+        .onAppear {
+            handlePanelOpen(text: initialText)
         }
         .translationTask(translationConfiguration) { @Sendable session in
             let textToTranslate = await MainActor.run { inputText }

@@ -68,26 +68,14 @@ struct WindowManagerTests {
         #expect(manager.isPanelIntendedOpen == true)
     }
 
-    @Test func openPanelPostsNotification() async throws {
+    @Test func openPanelCreatesPanel() async throws {
         let manager = createWindowManager()
-        var notificationReceived = false
 
-        let observer = NotificationCenter.default.addObserver(
-            forName: .didCapturePanelText,
-            object: nil,
-            queue: .main
-        ) { _ in
-            notificationReceived = true
-        }
+        #expect(manager.panel == nil)
 
         manager.openPanel()
 
-        // Give notification time to be delivered
-        try await Task.sleep(for: .milliseconds(50))
-
-        #expect(notificationReceived == true)
-
-        NotificationCenter.default.removeObserver(observer)
+        #expect(manager.panel != nil)
     }
 
     // MARK: - closePanel Tests
