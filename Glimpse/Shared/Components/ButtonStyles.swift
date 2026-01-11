@@ -5,16 +5,18 @@
 
 import SwiftUI
 
-/// Primary button style - dark filled with white uppercase text.
+/// Primary button style - configurable for normal and loading states.
 struct PrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
+
+    var isLoading: Bool = false
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textCase(.uppercase)
             .font(GlimpseTheme.Typography.buttonPrimary)
             .tracking(0.5)
-            .foregroundColor(.white)
+            .foregroundColor(foregroundColor)
             .padding(.horizontal, GlimpseTheme.Spacing.lg)
             .frame(height: GlimpseTheme.Sizing.primaryButtonHeight)
             .frame(minWidth: GlimpseTheme.Sizing.primaryButtonMinWidth)
@@ -24,36 +26,23 @@ struct PrimaryButtonStyle: ButtonStyle {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
-                    .strokeBorder(GlimpseTheme.Colors.panelBackground, lineWidth: 1)
+                    .strokeBorder(borderColor, lineWidth: 1)
             )
             .opacity(isEnabled ? 1.0 : 0.5)
     }
 
+    private var foregroundColor: Color {
+        isLoading ? GlimpseTheme.Colors.textDisabled : .white
+    }
+
+    private var borderColor: Color {
+        isLoading ? GlimpseTheme.Colors.buttonBorder : GlimpseTheme.Colors.panelBackground
+    }
+
     private func backgroundColor(isPressed: Bool) -> Color {
+        if isLoading { return .clear }
         if !isEnabled { return .gray }
         return isPressed ? Color.black.opacity(0.7) : .black
-    }
-}
-
-/// Loading button style - outlined with dark text for translating state.
-struct LoadingButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .textCase(.uppercase)
-            .font(GlimpseTheme.Typography.buttonPrimary)
-            .tracking(0.5)
-            .foregroundColor(GlimpseTheme.Colors.textDisabled)
-            .padding(.horizontal, GlimpseTheme.Spacing.lg)
-            .frame(height: GlimpseTheme.Sizing.primaryButtonHeight)
-            .frame(minWidth: GlimpseTheme.Sizing.primaryButtonMinWidth)
-            .background(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
-                    .fill(Color.clear)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
-                    .strokeBorder(GlimpseTheme.Colors.buttonBorder, lineWidth: 1)
-            )
     }
 }
 

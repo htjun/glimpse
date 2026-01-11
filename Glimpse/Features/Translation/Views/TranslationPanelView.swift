@@ -26,7 +26,6 @@ struct TranslationPanelView: View {
     @State private var translatedText: String = ""
     @State private var isTranslating: Bool = false
     @State private var translationError: String?
-    @FocusState private var isInputFocused: Bool
 
     /// The type of the current result (definition or translation).
     @State private var resultType: LookupResultType?
@@ -147,7 +146,6 @@ struct TranslationPanelView: View {
             inputText = text
             performLookup()
         }
-        isInputFocused = true
     }
 
     /// Resets all state for a fresh panel open.

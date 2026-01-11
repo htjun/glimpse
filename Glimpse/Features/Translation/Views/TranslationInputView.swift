@@ -34,29 +34,13 @@ struct TranslationInputView: View {
 
     // MARK: - View Components
 
-    @ViewBuilder
     private var translateButton: some View {
-        if isTranslating {
-            Button(action: {}) {
-                Text("Translating..")
-            }
-            .buttonStyle(LoadingButtonStyle())
-            .disabled(true)
-        } else {
-            Button(action: onTranslate) {
-                Text("Translate")
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .keyboardShortcut(.return, modifiers: .command)
-            .disabled(inputText.isEmpty)
+        Button(action: isTranslating ? {} : onTranslate) {
+            Text(isTranslating ? "Translating.." : "Translate")
         }
-    }
-
-    // MARK: - Public Methods
-
-    /// Programmatically focus the input field.
-    func focus() {
-        isInputFocused = true
+        .buttonStyle(PrimaryButtonStyle(isLoading: isTranslating))
+        .keyboardShortcut(.return, modifiers: .command)
+        .disabled(isTranslating || inputText.isEmpty)
     }
 }
 
