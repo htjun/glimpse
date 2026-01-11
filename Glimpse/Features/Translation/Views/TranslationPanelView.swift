@@ -38,40 +38,57 @@ struct TranslationPanelView: View {
     /// The target language of the current configuration, used to detect when we need a new config.
     @State private var currentConfigTarget: SupportedLanguage?
 
+    /// The detected source language from the most recent translation.
+    @State private var detectedSourceLanguage: SupportedLanguage?
+
     @AppStorage(LanguageSettingsKey.languageOne)
     private var languageOne: SupportedLanguage = .english
 
     @AppStorage(LanguageSettingsKey.languageTwo)
     private var languageTwo: SupportedLanguage = .korean
 
-    /// Whether to show the result section (translation, loading, or error).
-    private var showsResultSection: Bool {
-        !translatedText.isEmpty || isTranslating || translationError != nil
-    }
-
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 16) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    inputField
-                    if showsResultSection {
-                        Divider()
-                        resultSection
+        ZStack {
+            // Hidden escape handler
+            Button("") { WindowManager.shared.closePanel() }
+                .keyboardShortcut(.escape, modifiers: [])
+                .hidden()
+                .frame(width: 0, height: 0)
+
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        inputField
+
+                        translateButton
+
+                        if !translatedText.isEmpty {
+                            resultSection
+                        }
+
+                        if let error = translationError {
+                            errorSection(error)
+                        }
                     }
+                    .padding(24)
+                }
+                .frame(maxHeight: 500)
+                .scrollBounceBehavior(.basedOnSize)
+
+                if !translatedText.isEmpty && !isTranslating {
+                    Divider()
+                    footerSection
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
                 }
             }
-            .frame(maxHeight: 600)
-            .scrollBounceBehavior(.basedOnSize)
-
-            buttonBar
         }
-        .padding(20)
         .frame(width: 480, alignment: .top)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.15), radius: 30, x: 0, y: 15)
         .onReceive(NotificationCenter.default.publisher(for: .didCapturePanelText)) { notification in
             let text = notification.userInfo?["text"] as? String
             handlePanelOpen(text: text)
@@ -101,60 +118,61 @@ struct TranslationPanelView: View {
     // MARK: - View Components
 
     private var inputField: some View {
-        TextField("Enter text to translate...", text: $inputText, axis: .vertical)
+        TextField("Type here to translate...", text: $inputText, axis: .vertical)
             .textFieldStyle(.plain)
             .font(.system(size: 18))
             .lineLimit(1...)
             .focused($isInputFocused)
             .onSubmit { performLookup() }
-            .padding(12)
-            .background(Color(nsColor: .textBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     @ViewBuilder
-    private var resultSection: some View {
+    private var translateButton: some View {
         if isTranslating {
-            ProgressView()
-                .scaleEffect(0.8)
-                .frame(maxWidth: .infinity, minHeight: 40)
-        } else if let error = translationError {
-            Text(error)
-                .font(.system(size: 14))
-                .foregroundStyle(.red)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(12)
-        } else {
-            VStack(alignment: .leading, spacing: 8) {
-                if let resultType {
-                    Text(resultType.displayLabel)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.secondary)
-                }
-                Text(translatedText)
-                    .font(.system(size: 18))
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
+            Button(action: {}) {
+                Text("Translating..")
             }
-            .padding(12)
-            .background(Color.accentColor.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .buttonStyle(LoadingButtonStyle())
+            .disabled(true)
+        } else {
+            Button(action: { performLookup() }) {
+                Text("Translate")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .keyboardShortcut(.return, modifiers: .command)
+            .disabled(inputText.isEmpty)
         }
     }
 
-    private var buttonBar: some View {
+    private var resultSection: some View {
+        Text(translatedText)
+            .font(.system(size: 18))
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .textSelection(.enabled)
+    }
+
+    private func errorSection(_ error: String) -> some View {
         HStack {
-            Button("") { WindowManager.shared.closePanel() }
-                .keyboardShortcut(.escape, modifiers: [])
-                .hidden()
-
-            Spacer()
-
-            Button("Translate") { performLookup() }
-                .keyboardShortcut(.return, modifiers: .command)
-                .disabled(inputText.isEmpty || isTranslating)
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+            Text(error)
+                .font(.system(size: 14))
+                .foregroundStyle(.secondary)
         }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.orange.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var footerSection: some View {
+        TranslationFooterView(
+            sourceLanguage: detectedSourceLanguage ?? languageOne,
+            targetLanguage: currentConfigTarget ?? languageTwo,
+            onCopy: copyTranslation,
+            onReplace: replaceOriginalText
+        )
     }
 
     // MARK: - Private Methods
@@ -177,6 +195,7 @@ struct TranslationPanelView: View {
         translationError = nil
         isTranslating = false
         resultType = nil
+        detectedSourceLanguage = nil
     }
 
     /// Performs lookup by trying dictionary first for single words, then falling back to translation.
@@ -235,12 +254,14 @@ struct TranslationPanelView: View {
     private func determineTargetLanguage(for text: String) -> SupportedLanguage {
         guard let detected = detectLanguage(text) else {
             Self.logger.info("Language detection failed, defaulting to \(self.languageTwo.displayName)")
+            detectedSourceLanguage = languageOne
             return languageTwo
         }
 
         Self.logger.info("Detected language: \(detected.rawValue)")
 
         let inputMatchesLanguageOne = detected.rawValue == languageOne.rawValue
+        detectedSourceLanguage = inputMatchesLanguageOne ? languageOne : languageTwo
         return inputMatchesLanguageOne ? languageTwo : languageOne
     }
 
@@ -248,6 +269,19 @@ struct TranslationPanelView: View {
     private func retranslateIfNeeded() {
         guard !inputText.isEmpty, translationConfiguration != nil else { return }
         triggerTranslation()
+    }
+
+    /// Copies the translated text to the clipboard.
+    private func copyTranslation() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(translatedText, forType: .string)
+        Self.logger.info("Translation copied to clipboard")
+    }
+
+    /// Replaces the original selected text with the translation.
+    private func replaceOriginalText() {
+        // TODO: Implement replace functionality using accessibility APIs
+        Self.logger.info("Replace requested (not yet implemented)")
     }
 
 }

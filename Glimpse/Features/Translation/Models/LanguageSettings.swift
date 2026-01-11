@@ -50,6 +50,28 @@ enum SupportedLanguage: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Short display name for the language (3 letters).
+    var shortName: String {
+        switch self {
+        case .english: return "Eng"
+        case .korean: return "Kor"
+        case .japanese: return "Jpn"
+        case .chineseSimplified: return "Chn"
+        case .chineseTraditional: return "Cht"
+        case .spanish: return "Esp"
+        case .french: return "Fra"
+        case .german: return "Deu"
+        case .italian: return "Ita"
+        case .portuguese: return "Por"
+        case .russian: return "Rus"
+        case .arabic: return "Ara"
+        case .hindi: return "Hin"
+        case .thai: return "Tha"
+        case .vietnamese: return "Vie"
+        case .indonesian: return "Ind"
+        }
+    }
+
     /// Converts to `Locale.Language` for the Translation API.
     var localeLanguage: Locale.Language {
         Locale.Language(identifier: rawValue)
