@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import NaturalLanguage
 import os.log
 import SwiftUI
 import Translation
@@ -32,6 +33,15 @@ struct TranslationPanelView: View {
     /// Configuration for the Translation API session.
     /// When set/invalidated, triggers the .translationTask modifier.
     @State private var translationConfiguration: TranslationSession.Configuration?
+
+    /// The target language of the current configuration, used to detect when we need a new config.
+    @State private var currentConfigTarget: SupportedLanguage?
+
+    @AppStorage(LanguageSettingsKey.languageOne)
+    private var languageOne: SupportedLanguage = .english
+
+    @AppStorage(LanguageSettingsKey.languageTwo)
+    private var languageTwo: SupportedLanguage = .korean
 
     /// Whether to show the result section (translation, loading, or error).
     private var showsResultSection: Bool {
@@ -87,6 +97,8 @@ struct TranslationPanelView: View {
                 }
             }
         }
+        .onChange(of: languageOne) { retranslateIfNeeded() }
+        .onChange(of: languageTwo) { retranslateIfNeeded() }
     }
 
     // MARK: - View Components
@@ -169,14 +181,48 @@ struct TranslationPanelView: View {
         isTranslating = true
         translationError = nil
 
-        if translationConfiguration == nil {
-            translationConfiguration = TranslationSession.Configuration(
-                source: Locale.Language(identifier: "en"),
-                target: Locale.Language(identifier: "ko")
-            )
-        } else {
+        let targetLanguage = determineTargetLanguage(for: inputText)
+
+        // If we have a config with the same target, just invalidate to re-run
+        if translationConfiguration != nil && currentConfigTarget == targetLanguage {
             translationConfiguration?.invalidate()
+        } else {
+            // Need a new config for different target language
+            currentConfigTarget = targetLanguage
+            translationConfiguration = TranslationSession.Configuration(
+                source: nil,
+                target: targetLanguage.localeLanguage
+            )
         }
+    }
+
+    /// Detects the dominant language of the input text.
+    private func detectLanguage(_ text: String) -> NLLanguage? {
+        let recognizer = NLLanguageRecognizer()
+        recognizer.processString(text)
+        return recognizer.dominantLanguage
+    }
+
+    /// Determines the target language based on detected input language.
+    /// If input matches languageOne, translates to languageTwo, and vice versa.
+    private func determineTargetLanguage(for text: String) -> SupportedLanguage {
+        guard let detected = detectLanguage(text) else {
+            Self.logger.info("Language detection failed, defaulting to \(self.languageTwo.displayName)")
+            return languageTwo
+        }
+
+        Self.logger.info("Detected language: \(detected.rawValue)")
+
+        if detected.rawValue == languageOne.rawValue {
+            return languageTwo
+        }
+        return languageOne
+    }
+
+    /// Re-triggers translation if there's existing input text.
+    private func retranslateIfNeeded() {
+        guard !inputText.isEmpty, translationConfiguration != nil else { return }
+        triggerTranslation()
     }
 
 }
