@@ -5,6 +5,7 @@
 //  Created by Glimpse Contributors on 9/1/2026.
 //
 
+import AppKit
 import SwiftUI
 
 /// Menu bar dropdown view with quick actions and settings access.
@@ -13,6 +14,8 @@ struct MenuBarView: View {
     // MARK: - Properties
 
     let openTranslationPanel: () -> Void
+
+    @Environment(\.openSettings) private var openSettings
 
     // MARK: - Body
 
@@ -24,8 +27,10 @@ struct MenuBarView: View {
 
         Divider()
 
-        SettingsLink(label: { Text("Settings...") })
-            .keyboardShortcut(",", modifiers: .command)
+        Button("Settings...") {
+            bringSettingsToFront()
+        }
+        .keyboardShortcut(",", modifiers: .command)
 
         Divider()
 
@@ -33,6 +38,20 @@ struct MenuBarView: View {
             NSApplication.shared.terminate(nil)
         }
         .keyboardShortcut("q", modifiers: .command)
+    }
+
+    // MARK: - Private Methods
+
+    private func bringSettingsToFront() {
+        NSApp.activate(ignoringOtherApps: true)
+
+        // Find existing Settings window by title
+        if let settingsWindow = NSApp.windows.first(where: { $0.title == "Settings" }) {
+            settingsWindow.makeKeyAndOrderFront(nil)
+        } else {
+            // Window doesn't exist yet, open it
+            openSettings()
+        }
     }
 }
 
