@@ -149,4 +149,11 @@ final class WindowManager: NSObject, NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         isPanelIntendedOpen = false
     }
+
+    func windowDidResignKey(_ notification: Notification) {
+        // Close panel when it loses focus (user clicked outside)
+        if isPanelIntendedOpen {
+            closePanel()
+        }
+    }
 }
