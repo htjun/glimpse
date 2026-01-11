@@ -72,29 +72,31 @@ struct TranslationPanelView: View {
                             errorSection(error)
                         }
                     }
-                    .padding(24)
+                    .padding(16)
                 }
-                .frame(maxHeight: 500)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxHeight: 800)
                 .scrollBounceBehavior(.basedOnSize)
+                .id(translatedText)
 
                 if !translatedText.isEmpty && !isTranslating {
                     Divider()
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, 16)
                     footerSection
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, 16)
                         .padding(.vertical, 12)
                 }
             }
             }
         .frame(width: 480, alignment: .top)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
         .background(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color(red: 247 / 255, green: 247 / 255, blue: 244 / 255))
                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 4)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 8)
                 .strokeBorder(Color(red: 222 / 255, green: 221 / 255, blue: 217 / 255), lineWidth: 1)
         )
         .padding(30)
@@ -129,7 +131,7 @@ struct TranslationPanelView: View {
     private var inputField: some View {
         TextField("Type here to translate...", text: $inputText, axis: .vertical)
             .textFieldStyle(.plain)
-            .font(.system(size: 18))
+            .font(.system(size: 16))
             .lineLimit(1...)
             .focused($isInputFocused)
             .onSubmit { performLookup() }
@@ -155,7 +157,7 @@ struct TranslationPanelView: View {
 
     private var resultSection: some View {
         Text(translatedText)
-            .font(.system(size: 18))
+            .font(.system(size: 16))
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
             .textSelection(.enabled)
