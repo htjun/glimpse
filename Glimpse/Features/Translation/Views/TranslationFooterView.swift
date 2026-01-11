@@ -15,9 +15,9 @@ struct TranslationFooterView: View {
 
     var body: some View {
         HStack {
-            HStack(spacing: 12) {
+            HStack(spacing: GlimpseTheme.Spacing.md) {
                 Button(action: onCopy) {
-                    HStack(spacing: 4) {
+                    HStack(spacing: GlimpseTheme.Spacing.xs) {
                         Text("Copy")
                         Text("\u{2318}+C")
                             .foregroundStyle(.secondary)
@@ -26,7 +26,7 @@ struct TranslationFooterView: View {
                 .buttonStyle(SecondaryButtonStyle())
 
                 Button(action: onReplace) {
-                    HStack(spacing: 4) {
+                    HStack(spacing: GlimpseTheme.Spacing.xs) {
                         Text("Replace")
                         Text("\u{2318}+R")
                             .foregroundStyle(.secondary)
@@ -38,7 +38,7 @@ struct TranslationFooterView: View {
             Spacer()
 
             Text("\(sourceLanguage.shortName) \u{2192} \(targetLanguage.shortName)")
-                .font(.system(size: 12, weight: .medium))
+                .font(GlimpseTheme.Typography.footnote)
                 .foregroundStyle(.secondary)
         }
     }

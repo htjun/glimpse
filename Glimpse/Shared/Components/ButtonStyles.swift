@@ -7,21 +7,31 @@ import SwiftUI
 
 /// Primary button style - dark filled with white uppercase text.
 struct PrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textCase(.uppercase)
-            .font(.system(size: 13, weight: .semibold))
+            .font(GlimpseTheme.Typography.buttonPrimary)
             .tracking(0.5)
             .foregroundColor(.white)
-            .frame(width: 130, height: 32)
+            .padding(.horizontal, GlimpseTheme.Spacing.lg)
+            .frame(height: GlimpseTheme.Sizing.primaryButtonHeight)
+            .frame(minWidth: GlimpseTheme.Sizing.primaryButtonMinWidth)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(configuration.isPressed ? Color.black.opacity(0.7) : Color.black)
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .fill(backgroundColor(isPressed: configuration.isPressed))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color(red: 247 / 255, green: 247 / 255, blue: 244 / 255), lineWidth: 1)
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .strokeBorder(GlimpseTheme.Colors.panelBackground, lineWidth: 1)
             )
+            .opacity(isEnabled ? 1.0 : 0.5)
+    }
+
+    private func backgroundColor(isPressed: Bool) -> Color {
+        if !isEnabled { return .gray }
+        return isPressed ? Color.black.opacity(0.7) : .black
     }
 }
 
@@ -30,17 +40,19 @@ struct LoadingButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textCase(.uppercase)
-            .font(.system(size: 13, weight: .semibold))
+            .font(GlimpseTheme.Typography.buttonPrimary)
             .tracking(0.5)
-            .foregroundColor(.primary.opacity(0.6))
-            .frame(width: 130, height: 32)
+            .foregroundColor(GlimpseTheme.Colors.textDisabled)
+            .padding(.horizontal, GlimpseTheme.Spacing.lg)
+            .frame(height: GlimpseTheme.Sizing.primaryButtonHeight)
+            .frame(minWidth: GlimpseTheme.Sizing.primaryButtonMinWidth)
             .background(
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
                     .fill(Color.clear)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color.gray.opacity(0.4), lineWidth: 1)
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .strokeBorder(GlimpseTheme.Colors.buttonBorder, lineWidth: 1)
             )
     }
 }
@@ -50,18 +62,18 @@ struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .textCase(.uppercase)
-            .font(.system(size: 11, weight: .medium))
+            .font(GlimpseTheme.Typography.buttonSecondary)
             .tracking(0.3)
             .foregroundColor(configuration.isPressed ? .secondary : .primary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.horizontal, GlimpseTheme.Spacing.md)
+            .padding(.vertical, GlimpseTheme.Spacing.sm)
             .background(
-                RoundedRectangle(cornerRadius: 6)
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.small)
                     .fill(configuration.isPressed ? Color.gray.opacity(0.1) : Color.clear)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.small)
+                    .stroke(GlimpseTheme.Colors.buttonBorder, lineWidth: 1)
             )
     }
 }

@@ -51,55 +51,35 @@ struct TranslationPanelView: View {
 
     var body: some View {
         ZStack {
-            // Hidden escape handler
-            Button("") { WindowManager.shared.closePanel() }
-                .keyboardShortcut(.escape, modifiers: [])
-                .hidden()
-                .frame(width: 0, height: 0)
+            escapeHandler
 
             VStack(spacing: 0) {
                 ScrollView {
-                    VStack(spacing: 16) {
-                        inputField
+                    VStack(spacing: GlimpseTheme.Spacing.lg) {
+                        TranslationInputView(
+                            inputText: $inputText,
+                            isTranslating: isTranslating,
+                            onTranslate: performLookup
+                        )
 
-                        translateButton
-
-                        if !translatedText.isEmpty {
-                            resultSection
-                        }
-
-                        if let error = translationError {
-                            errorSection(error)
-                        }
+                        TranslationResultView(
+                            result: translatedText,
+                            error: translationError
+                        )
                     }
-                    .padding(16)
+                    .padding(GlimpseTheme.Spacing.lg)
                 }
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxHeight: 800)
+                .frame(maxHeight: GlimpseTheme.Sizing.panelMaxHeight)
                 .scrollBounceBehavior(.basedOnSize)
                 .id(translatedText)
 
-                if !translatedText.isEmpty && !isTranslating {
-                    Divider()
-                        .padding(.horizontal, 16)
+                if hasResult {
                     footerSection
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
                 }
             }
-            }
-        .frame(width: 480, alignment: .top)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(red: 247 / 255, green: 247 / 255, blue: 244 / 255))
-                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 4)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(Color(red: 222 / 255, green: 221 / 255, blue: 217 / 255), lineWidth: 1)
-        )
-        .padding(30)
+        }
+        .panelStyle()
         .onReceive(NotificationCenter.default.publisher(for: .didCapturePanelText)) { notification in
             let text = notification.userInfo?["text"] as? String
             handlePanelOpen(text: text)
@@ -126,64 +106,35 @@ struct TranslationPanelView: View {
         .onChange(of: languageTwo) { retranslateIfNeeded() }
     }
 
+    // MARK: - Computed Properties
+
+    private var hasResult: Bool {
+        !translatedText.isEmpty && !isTranslating
+    }
+
     // MARK: - View Components
 
-    private var inputField: some View {
-        TextField("Type here to translate...", text: $inputText, axis: .vertical)
-            .textFieldStyle(.plain)
-            .font(.system(size: 16))
-            .lineLimit(1...)
-            .focused($isInputFocused)
-            .onSubmit { performLookup() }
-    }
-
-    @ViewBuilder
-    private var translateButton: some View {
-        if isTranslating {
-            Button(action: {}) {
-                Text("Translating..")
-            }
-            .buttonStyle(LoadingButtonStyle())
-            .disabled(true)
-        } else {
-            Button(action: { performLookup() }) {
-                Text("Translate")
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .keyboardShortcut(.return, modifiers: .command)
-            .disabled(inputText.isEmpty)
-        }
-    }
-
-    private var resultSection: some View {
-        Text(translatedText)
-            .font(.system(size: 16))
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .textSelection(.enabled)
-    }
-
-    private func errorSection(_ error: String) -> some View {
-        HStack {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.orange)
-            Text(error)
-                .font(.system(size: 14))
-                .foregroundStyle(.secondary)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.orange.opacity(0.1))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+    private var escapeHandler: some View {
+        Button("") { WindowManager.shared.closePanel() }
+            .keyboardShortcut(.escape, modifiers: [])
+            .hidden()
+            .frame(width: 0, height: 0)
     }
 
     private var footerSection: some View {
-        TranslationFooterView(
-            sourceLanguage: detectedSourceLanguage ?? languageOne,
-            targetLanguage: currentConfigTarget ?? languageTwo,
-            onCopy: copyTranslation,
-            onReplace: replaceOriginalText
-        )
+        Group {
+            Divider()
+                .padding(.horizontal, GlimpseTheme.Spacing.lg)
+
+            TranslationFooterView(
+                sourceLanguage: detectedSourceLanguage ?? languageOne,
+                targetLanguage: currentConfigTarget ?? languageTwo,
+                onCopy: copyTranslation,
+                onReplace: replaceOriginalText
+            )
+            .padding(.horizontal, GlimpseTheme.Spacing.lg)
+            .padding(.vertical, GlimpseTheme.Spacing.md)
+        }
     }
 
     // MARK: - Private Methods
@@ -294,7 +245,27 @@ struct TranslationPanelView: View {
         // TODO: Implement replace functionality using accessibility APIs
         Self.logger.info("Replace requested (not yet implemented)")
     }
+}
 
+// MARK: - Panel Style Modifier
+
+extension View {
+    /// Applies the standard translation panel styling.
+    func panelStyle() -> some View {
+        self
+            .frame(width: GlimpseTheme.Sizing.panelWidth, alignment: .top)
+            .clipShape(RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard))
+            .background(
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .fill(GlimpseTheme.Colors.panelBackground)
+                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .strokeBorder(GlimpseTheme.Colors.panelBorder, lineWidth: 1)
+            )
+            .padding(GlimpseTheme.Spacing.xl)
+    }
 }
 
 #Preview {
