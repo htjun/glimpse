@@ -28,6 +28,9 @@ struct TranslationPanelView: View {
     @State private var translationError: String?
     @FocusState private var isInputFocused: Bool
 
+    /// The type of the current result (definition or translation).
+    @State private var resultType: LookupResultType?
+
     /// Configuration for the Translation API session.
     /// When set/invalidated, triggers the .translationTask modifier.
     @State private var translationConfiguration: TranslationSession.Configuration?
@@ -103,7 +106,7 @@ struct TranslationPanelView: View {
             .font(.system(size: 18))
             .lineLimit(1...)
             .focused($isInputFocused)
-            .onSubmit { triggerTranslation() }
+            .onSubmit { performLookup() }
             .padding(12)
             .background(Color(nsColor: .textBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -122,14 +125,21 @@ struct TranslationPanelView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
         } else {
-            Text(translatedText)
-                .font(.system(size: 18))
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .textSelection(.enabled)
-                .padding(12)
-                .background(Color.accentColor.opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 8) {
+                if let resultType {
+                    Text(resultType.displayLabel)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
+                Text(translatedText)
+                    .font(.system(size: 18))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+            }
+            .padding(12)
+            .background(Color.accentColor.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
 
@@ -141,7 +151,7 @@ struct TranslationPanelView: View {
 
             Spacer()
 
-            Button("Translate") { triggerTranslation() }
+            Button("Translate") { performLookup() }
                 .keyboardShortcut(.return, modifiers: .command)
                 .disabled(inputText.isEmpty || isTranslating)
         }
@@ -155,7 +165,7 @@ struct TranslationPanelView: View {
         resetState()
         if let text {
             inputText = text
-            triggerTranslation()
+            performLookup()
         }
         isInputFocused = true
     }
@@ -166,6 +176,28 @@ struct TranslationPanelView: View {
         translatedText = ""
         translationError = nil
         isTranslating = false
+        resultType = nil
+    }
+
+    /// Performs lookup by trying dictionary first for single words, then falling back to translation.
+    private func performLookup() {
+        guard !inputText.isEmpty else { return }
+
+        let trimmed = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Try dictionary lookup for single words
+        if DictionaryService.shared.isSingleWord(trimmed),
+           let definition = DictionaryService.shared.lookupDefinition(for: trimmed) {
+            translatedText = definition
+            resultType = .definition
+            translationError = nil
+            isTranslating = false
+            Self.logger.info("Dictionary lookup succeeded for: \(trimmed.prefix(20))")
+            return
+        }
+
+        // Fall back to translation
+        triggerTranslation()
     }
 
     /// Triggers translation by setting/invalidating the configuration.
@@ -174,6 +206,7 @@ struct TranslationPanelView: View {
 
         isTranslating = true
         translationError = nil
+        resultType = .translation
 
         let targetLanguage = determineTargetLanguage(for: inputText)
 
