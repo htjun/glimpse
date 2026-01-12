@@ -166,25 +166,59 @@ struct TranslationPanelView: View {
         detectedSourceLanguage = nil
     }
 
-    /// Performs lookup by trying dictionary first for single words, then falling back to translation.
+    /// Performs lookup by trying bilingual dictionary first for single words, then falling back to translation.
     private func performLookup() {
         guard !inputText.isEmpty else { return }
 
         let trimmed = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Try dictionary lookup for single words
-        if DictionaryService.shared.isSingleWord(trimmed),
-           let definition = DictionaryService.shared.lookupDefinition(for: trimmed) {
-            translatedText = definition
-            resultType = .definition
-            translationError = nil
-            isTranslating = false
-            Self.logger.info("Dictionary lookup succeeded for: \(trimmed.prefix(20))")
-            return
+        // Try bilingual dictionary lookup for single words when one language is English
+        if DictionaryService.shared.isSingleWord(trimmed) {
+            if let definition = lookupBilingualDefinition(for: trimmed) {
+                translatedText = definition
+                resultType = .definition
+                translationError = nil
+                isTranslating = false
+                Self.logger.info("Bilingual dictionary lookup succeeded for: \(trimmed.prefix(20))")
+                return
+            }
         }
 
         // Fall back to translation
         triggerTranslation()
+    }
+
+    /// Attempts bilingual dictionary lookup when one of the language pair is English.
+    /// Returns the definition if found, or nil to fall back to translation.
+    private func lookupBilingualDefinition(for word: String) -> String? {
+        // Bilingual dictionaries are always paired with English
+        let nonEnglishLanguage: SupportedLanguage? = switch (languageOne, languageTwo) {
+        case (.english, let other): other
+        case (let other, .english): other
+        default: nil
+        }
+
+        guard let targetLang = nonEnglishLanguage,
+              let pattern = targetLang.bilingualDictionaryPattern else {
+            Self.logger.debug("No bilingual dictionary for language pair")
+            return nil
+        }
+
+        guard let definition = DictionaryService.shared.lookupBilingualDefinition(
+            for: word,
+            languagePattern: pattern
+        ) else {
+            return nil
+        }
+
+        // Update detected source language based on input language
+        if let detected = detectLanguage(word) {
+            let inputMatchesEnglish = detected.rawValue == SupportedLanguage.english.rawValue
+            detectedSourceLanguage = inputMatchesEnglish ? .english : targetLang
+            currentConfigTarget = inputMatchesEnglish ? targetLang : .english
+        }
+
+        return definition
     }
 
     /// Triggers translation by setting/invalidating the configuration.

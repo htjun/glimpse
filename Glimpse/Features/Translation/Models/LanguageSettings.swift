@@ -76,6 +76,31 @@ enum SupportedLanguage: String, CaseIterable, Identifiable {
     var localeLanguage: Locale.Language {
         Locale.Language(identifier: rawValue)
     }
+
+    /// Pattern used to find the bilingual dictionary for this language.
+    /// Returns `nil` for languages without a bilingual dictionary (English, Arabic, Russian, Indonesian).
+    var bilingualDictionaryPattern: String? {
+        switch self {
+        case .korean: return "Korean"
+        case .japanese: return "Japanese"
+        case .chineseSimplified: return "Simplified Chinese"
+        case .chineseTraditional: return "Traditional Chinese"
+        case .spanish: return "Spanish"
+        case .french: return "French"
+        case .german: return "German"
+        case .italian: return "Italian"
+        case .portuguese: return "Portuguese"
+        case .hindi: return "Hindi"
+        case .thai: return "Thai"
+        case .vietnamese: return "Vietnamese"
+        case .english, .arabic, .russian, .indonesian: return nil
+        }
+    }
+
+    /// Whether a bilingual dictionary exists for this language (paired with English).
+    var hasBilingualDictionary: Bool {
+        bilingualDictionaryPattern != nil
+    }
 }
 
 /// Keys for UserDefaults storage.
