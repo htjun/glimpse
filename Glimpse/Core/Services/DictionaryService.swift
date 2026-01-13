@@ -62,7 +62,7 @@ final class DictionaryService {
 
         let result = definition.takeRetainedValue() as String
         logger.debug("Found definition for: \(trimmed)")
-        return result
+        return formatDefinition(result)
     }
 
     /// Determines if the input text is a single word.
@@ -110,7 +110,7 @@ final class DictionaryService {
 
         let result = definition.takeRetainedValue() as String
         logger.debug("Found bilingual definition for: \(trimmed) in \(languagePattern) dictionary")
-        return result
+        return formatDefinition(result)
     }
 
     /// Checks if a bilingual dictionary is available for the given language pattern.
@@ -125,6 +125,66 @@ final class DictionaryService {
     }
 
     // MARK: - Private Methods
+
+    /// Parts of speech patterns for each language.
+    /// Add new languages here - no code changes needed in formatDefinition().
+    private let partsOfSpeechByLanguage: [String: [String]] = [
+        "Korean": ["명사", "형용사", "동사", "부사", "감탄사"],
+        "English": ["noun", "verb", "adjective", "adverb", "interjection"],
+        "Japanese": ["名詞", "動詞", "形容詞", "副詞", "感動詞"],
+        "Chinese": ["名词", "动词", "形容词", "副词", "叹词"],
+        "Spanish": ["sustantivo", "verbo", "adjetivo", "adverbio"],
+        "French": ["nom", "verbe", "adjectif", "adverbe"],
+        "German": ["Substantiv", "Verb", "Adjektiv", "Adverb"],
+    ]
+
+    /// Formats a raw dictionary definition string for better readability.
+    /// Adds line breaks after pronunciation, etymology, before numbered definitions, and examples.
+    private func formatDefinition(_ raw: String) -> String {
+        var result = raw
+
+        // Universal patterns (apply to all dictionaries)
+
+        // 1. Newline after pronunciation (| ... |)
+        result = result.replacingOccurrences(
+            of: #"(\|[^|]+\|)(\s+)"#,
+            with: "$1\n",
+            options: .regularExpression
+        )
+
+        // 2. Newline after etymology【...】
+        result = result.replacingOccurrences(
+            of: #"(【[^】]+】)\s*"#,
+            with: "$1\n\n",
+            options: .regularExpression
+        )
+
+        // 3. Newline before numbered definitions (1., 2., etc.)
+        //    But not for sub-numbers like "1.1"
+        result = result.replacingOccurrences(
+            of: #"(?<=[^\d\n])\s*(\d+\.(?!\d))"#,
+            with: "\n$1",
+            options: .regularExpression
+        )
+
+        // 4. Newline + indent before examples (▸)
+        result = result.replacingOccurrences(
+            of: #"\s*(▸)"#,
+            with: "\n   $1",
+            options: .regularExpression
+        )
+
+        // Language-specific: parts of speech from all languages
+        let allPartsOfSpeech = partsOfSpeechByLanguage.values.flatMap { $0 }
+        let posPattern = allPartsOfSpeech.joined(separator: "|")
+        result = result.replacingOccurrences(
+            of: "(?<=\\.)\\s*(\(posPattern))\\b",
+            with: "\n\n$1",
+            options: [.regularExpression, .caseInsensitive]
+        )
+
+        return result.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     /// Caches available bilingual dictionaries.
     private func cacheBilingualDictionaries() {
