@@ -30,6 +30,9 @@ final class WindowManager: NSObject, NSWindowDelegate {
     /// Tracks the intended panel state.
     private(set) var isPanelIntendedOpen: Bool = false
 
+    /// Mouse event monitor for detecting clicks outside the panel.
+    private var mouseMonitor: Any?
+
     /// Notification center (injectable for testing).
     var notificationCenter: NotificationCenter = .default
 
@@ -94,6 +97,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
         // Size and show panel
         centerPanel()
         panel.makeKeyAndOrderFront(nil)
+        installMouseMonitor()
 
         logger.info("Panel opened")
     }
@@ -101,6 +105,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
     /// Closes the panel.
     func closePanel() {
         isPanelIntendedOpen = false
+        removeMouseMonitor()
         panel?.orderOut(nil)
         logger.debug("Panel closed")
     }
@@ -134,6 +139,30 @@ final class WindowManager: NSObject, NSWindowDelegate {
         panel.setFrameOrigin(origin)
     }
 
+    /// Installs a global mouse monitor to detect clicks outside the panel.
+    private func installMouseMonitor() {
+        removeMouseMonitor()
+
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, let panel = self.panel, self.isPanelIntendedOpen else { return }
+
+                let clickLocation = NSEvent.mouseLocation
+                if !panel.frame.contains(clickLocation) {
+                    self.closePanel()
+                }
+            }
+        }
+    }
+
+    /// Removes the mouse event monitor.
+    private func removeMouseMonitor() {
+        if let monitor = mouseMonitor {
+            NSEvent.removeMonitor(monitor)
+            mouseMonitor = nil
+        }
+    }
+
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
@@ -141,9 +170,8 @@ final class WindowManager: NSObject, NSWindowDelegate {
     }
 
     func windowDidResignKey(_ notification: Notification) {
-        // Close panel when it loses focus (user clicked outside)
-        if isPanelIntendedOpen {
-            closePanel()
-        }
+        // No-op: We use mouse monitoring instead of focus-based closing.
+        // This prevents the panel from closing when system processes
+        // (like the Translation API extension) temporarily steal focus.
     }
 }

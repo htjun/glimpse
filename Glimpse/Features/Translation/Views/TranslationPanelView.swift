@@ -97,13 +97,19 @@ struct TranslationPanelView: View {
             do {
                 let response = try await session.translate(textToTranslate)
                 await MainActor.run {
-                    translatedText = response.targetText
-                    translationError = nil
+                    if response.targetText.isEmpty || response.targetText == textToTranslate {
+                        // No meaningful translation found
+                        translationError = "No translation found"
+                        translatedText = ""
+                    } else {
+                        translatedText = response.targetText
+                        translationError = nil
+                    }
                     isTranslating = false
                 }
             } catch {
                 await MainActor.run {
-                    translationError = "Translation failed: \(error.localizedDescription)"
+                    translationError = "Translation failed"
                     translatedText = ""
                     isTranslating = false
                 }
