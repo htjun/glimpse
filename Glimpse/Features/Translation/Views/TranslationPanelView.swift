@@ -74,14 +74,17 @@ struct TranslationPanelView: View {
 
                         // Button with edge-to-edge divider
                         translateButtonWithDivider
+                            .padding(.bottom, hasResult ? 0 : GlimpseTheme.Spacing.lg)
 
-                        // Result section with padding
-                        TranslationResultView(
-                            result: translatedText,
-                            error: translationError
-                        )
-                        .padding(.horizontal, GlimpseTheme.Spacing.lg)
-                        .padding(.bottom, GlimpseTheme.Spacing.lg)
+                        // Result section with padding (only when there's content)
+                        if hasResult || translationError != nil {
+                            TranslationResultView(
+                                result: translatedText,
+                                error: translationError
+                            )
+                            .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                            .padding(.bottom, GlimpseTheme.Spacing.lg)
+                        }
                     }
                 }
                 .fixedSize(horizontal: false, vertical: true)
@@ -142,7 +145,9 @@ struct TranslationPanelView: View {
 
     private var translateButtonWithDivider: some View {
         ZStack {
-            Divider()
+            if hasResult {
+                Divider()
+            }
 
             Button(isTranslating ? "Translating.." : "Translate", action: performLookup)
                 .buttonStyle(PrimaryButtonStyle(isLoading: isTranslating))
