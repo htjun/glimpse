@@ -47,11 +47,13 @@ enum GlimpseTheme {
     // MARK: - Typography
 
     enum Typography {
-        static let body = Font.system(size: 16)
-        static let caption = Font.system(size: 14)
-        static let footnote = Font.system(size: 12, weight: .medium)
-        static let buttonPrimary = Font.system(size: 13, weight: .semibold)
-        static let buttonSecondary = Font.system(size: 11, weight: .medium)
+        private static let fontFamily = "Geist"
+
+        static let body = Font.custom("\(fontFamily)-Regular", size: 16)
+        static let caption = Font.custom("\(fontFamily)-Regular", size: 14)
+        static let footnote = Font.custom("\(fontFamily)-Medium", size: 12)
+        static let buttonPrimary = Font.custom("\(fontFamily)-SemiBold", size: 13)
+        static let buttonSecondary = Font.custom("\(fontFamily)-Medium", size: 11)
     }
 
     // MARK: - Sizing
