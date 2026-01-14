@@ -158,9 +158,6 @@ struct TranslationPanelView: View {
 
     private var footerSection: some View {
         Group {
-            Divider()
-                .padding(.horizontal, GlimpseTheme.Spacing.lg)
-
             TranslationFooterView(
                 sourceLanguage: detectedSourceLanguage ?? languageOne,
                 targetLanguage: currentConfigTarget ?? languageTwo,
