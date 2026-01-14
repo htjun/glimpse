@@ -64,18 +64,25 @@ struct TranslationPanelView: View {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(spacing: GlimpseTheme.Spacing.lg) {
+                        // Input section with padding
                         TranslationInputView(
                             inputText: $inputText,
-                            isTranslating: isTranslating,
-                            onTranslate: performLookup
+                            onSubmit: performLookup
                         )
+                        .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                        .padding(.top, GlimpseTheme.Spacing.lg)
 
+                        // Button with edge-to-edge divider
+                        translateButtonWithDivider
+
+                        // Result section with padding
                         TranslationResultView(
                             result: translatedText,
                             error: translationError
                         )
+                        .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                        .padding(.bottom, GlimpseTheme.Spacing.lg)
                     }
-                    .padding(GlimpseTheme.Spacing.lg)
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxHeight: GlimpseTheme.Sizing.panelMaxHeight)
@@ -132,6 +139,17 @@ struct TranslationPanelView: View {
             .keyboardShortcut(.escape, modifiers: [])
             .hidden()
             .frame(width: 0, height: 0)
+    }
+
+    private var translateButtonWithDivider: some View {
+        ZStack {
+            Divider()
+
+            Button(isTranslating ? "Translating.." : "Translate", action: performLookup)
+                .buttonStyle(PrimaryButtonStyle(isLoading: isTranslating))
+                .keyboardShortcut(.return, modifiers: .command)
+                .disabled(isTranslating || inputText.isEmpty)
+        }
     }
 
     private var footerSection: some View {

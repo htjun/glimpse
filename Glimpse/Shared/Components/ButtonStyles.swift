@@ -21,14 +21,13 @@ struct PrimaryButtonStyle: ButtonStyle {
             .frame(height: GlimpseTheme.Sizing.primaryButtonHeight)
             .frame(minWidth: GlimpseTheme.Sizing.primaryButtonMinWidth)
             .background(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                Capsule()
                     .fill(backgroundColor(isPressed: configuration.isPressed))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                Capsule()
                     .strokeBorder(borderColor, lineWidth: 1)
             )
-            .opacity(isEnabled ? 1.0 : 0.5)
     }
 
     private var foregroundColor: Color {
@@ -36,12 +35,12 @@ struct PrimaryButtonStyle: ButtonStyle {
     }
 
     private var borderColor: Color {
-        isLoading ? GlimpseTheme.Colors.buttonBorder : GlimpseTheme.Colors.panelBackground
+        isLoading ? GlimpseTheme.Colors.buttonBorder : .clear
     }
 
     private func backgroundColor(isPressed: Bool) -> Color {
-        if isLoading { return .clear }
-        if !isEnabled { return .gray }
+        if isLoading { return GlimpseTheme.Colors.panelBackground }
+        if !isEnabled { return Color(red: 203 / 255, green: 203 / 255, blue: 203 / 255) }
         return isPressed ? Color.black.opacity(0.7) : .black
     }
 }
