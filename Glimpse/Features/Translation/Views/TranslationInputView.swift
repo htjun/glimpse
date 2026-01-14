@@ -14,17 +14,23 @@ struct TranslationInputView: View {
     let onSubmit: () -> Void
 
     @FocusState private var isInputFocused: Bool
+    @State private var selection: TextSelection?
 
     // MARK: - Body
 
     var body: some View {
-        TextField("Type here to translate...", text: $inputText, axis: .vertical)
+        TextField("Type here to translate...", text: $inputText, selection: $selection, axis: .vertical)
             .textFieldStyle(.plain)
             .font(GlimpseTheme.Typography.body)
             .lineLimit(1...)
             .focused($isInputFocused)
             .onSubmit { onSubmit() }
-            .onAppear { isInputFocused = true }
+            .onAppear {
+                isInputFocused = true
+                DispatchQueue.main.async {
+                    selection = TextSelection(insertionPoint: inputText.endIndex)
+                }
+            }
     }
 }
 
