@@ -2,7 +2,7 @@
 
 A lightweight macOS menu bar app for instant translation of selected text.
 
-![macOS 15.0+](https://img.shields.io/badge/macOS-15.0%2B-blue)
+![macOS 15.5+](https://img.shields.io/badge/macOS-15.5%2B-blue)
 ![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange)
 
 ## Overview
@@ -16,10 +16,11 @@ Glimpse runs quietly in your menu bar and activates instantly with a global hotk
 - **Automatic Text Capture** — Grabs selected text from any application via accessibility APIs
 - **Floating Panel** — Translation appears in a non-intrusive floating window
 - **Native Translation** — Uses Apple's built-in Translation API for fast, private translations
+- **Dictionary Lookup** — Single words show definitions from macOS Dictionary before translation
 
 ## Requirements
 
-- macOS 15.0 or later
+- macOS 15.5 or later
 - Accessibility permissions (required for text capture)
 
 > **Note:** Glimpse requires accessibility access and cannot be sandboxed, so it's distributed directly rather than through the App Store.
@@ -86,12 +87,19 @@ swiftformat .
 
 ```
 Glimpse/
-├── App/              # Entry point, AppDelegate
-├── Features/         # Feature modules
-│   └── Translation/  # Translation panel views and view models
-├── Core/             # Services (Accessibility, Hotkey, Window management)
-├── Shared/           # Extensions and utilities
-└── Resources/        # Assets, Info.plist, Entitlements
+├── App/                    # Entry point, AppDelegate
+├── Features/
+│   ├── Translation/        # Translation panel views and view models
+│   └── Settings/           # Settings window
+├── Core/
+│   ├── Hotkey/             # KeyboardShortcuts extension
+│   └── Services/           # AccessibilityService, WindowManager, DictionaryService
+├── Shared/
+│   ├── Components/         # Reusable button styles
+│   ├── DesignSystem/       # Theme, colors, typography
+│   ├── Extensions/
+│   └── Utilities/
+└── Resources/              # Assets, Fonts, Info.plist, Entitlements
 ```
 
 See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
