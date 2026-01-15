@@ -5,8 +5,8 @@
 //  Created by Glimpse Contributors on 1/11/2026.
 //
 
-import SwiftUI
 import KeyboardShortcuts
+import SwiftUI
 
 /// Settings view for configuring app preferences.
 struct SettingsView: View {
@@ -39,33 +39,31 @@ struct SettingsView: View {
 
     private var languagePairRow: some View {
         HStack(spacing: 12) {
-            Picker("Language 1", selection: $languageOne) {
-                ForEach(availableLanguages(excluding: languageTwo)) { language in
-                    Text(language.displayName).tag(language)
-                }
-            }
-            .labelsHidden()
-            .frame(maxWidth: .infinity)
+            LanguagePicker(selection: $languageOne, excluding: languageTwo)
 
             Image(systemName: "arrow.left.arrow.right")
                 .font(.title3)
                 .foregroundStyle(.secondary)
 
-            Picker("Language 2", selection: $languageTwo) {
-                ForEach(availableLanguages(excluding: languageOne)) { language in
-                    Text(language.displayName).tag(language)
-                }
-            }
-            .labelsHidden()
-            .frame(maxWidth: .infinity)
+            LanguagePicker(selection: $languageTwo, excluding: languageOne)
         }
     }
+}
 
-    // MARK: - Private Methods
+// MARK: - Language Picker
 
-    /// Returns all languages except the excluded one.
-    private func availableLanguages(excluding: SupportedLanguage) -> [SupportedLanguage] {
-        SupportedLanguage.allCases.filter { $0 != excluding }
+private struct LanguagePicker: View {
+    @Binding var selection: SupportedLanguage
+    let excluding: SupportedLanguage
+
+    var body: some View {
+        Picker("Language", selection: $selection) {
+            ForEach(SupportedLanguage.allCases.filter { $0 != excluding }) { language in
+                Text(language.displayName).tag(language)
+            }
+        }
+        .labelsHidden()
+        .frame(maxWidth: .infinity)
     }
 }
 

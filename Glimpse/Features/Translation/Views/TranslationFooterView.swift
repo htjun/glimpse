@@ -16,23 +16,8 @@ struct TranslationFooterView: View {
     var body: some View {
         HStack {
             HStack(spacing: GlimpseTheme.Spacing.md) {
-                Button(action: onCopy) {
-                    HStack(spacing: GlimpseTheme.Spacing.xs) {
-                        Text("Copy")
-                        Text("\u{2318}+C")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(SecondaryButtonStyle())
-
-                Button(action: onReplace) {
-                    HStack(spacing: GlimpseTheme.Spacing.xs) {
-                        Text("Replace")
-                        Text("\u{2318}+R")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(SecondaryButtonStyle())
+                ActionButton(title: "Copy", shortcut: "C", action: onCopy)
+                ActionButton(title: "Replace", shortcut: "R", action: onReplace)
             }
 
             Spacer()
@@ -41,5 +26,24 @@ struct TranslationFooterView: View {
                 .font(GlimpseTheme.Typography.footnote)
                 .foregroundStyle(.secondary)
         }
+    }
+}
+
+// MARK: - Action Button
+
+private struct ActionButton: View {
+    let title: String
+    let shortcut: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: GlimpseTheme.Spacing.xs) {
+                Text(title)
+                Text("\u{2318}+\(shortcut)")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .buttonStyle(SecondaryButtonStyle())
     }
 }

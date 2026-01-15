@@ -71,10 +71,7 @@ struct TranslationPanelView: View {
                     .padding(.horizontal, GlimpseTheme.Spacing.lg)
                     .padding(.top, GlimpseTheme.Spacing.lg)
                 }
-                .frame(maxHeight: 200)
-                .fixedSize(horizontal: false, vertical: true)
-                .scrollBounceBehavior(.basedOnSize)
-                .scrollIndicators(.automatic)
+                .constrainedScrollSection(maxHeight: 200)
 
                 // Button - fixed height
                 translateButtonWithDivider
@@ -90,10 +87,7 @@ struct TranslationPanelView: View {
                         .padding(.horizontal, GlimpseTheme.Spacing.lg)
                         .padding(.bottom, GlimpseTheme.Spacing.lg)
                     }
-                    .frame(maxHeight: 500)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .scrollBounceBehavior(.basedOnSize)
-                    .scrollIndicators(.automatic)
+                    .constrainedScrollSection(maxHeight: 500)
                 }
 
                 // Footer - fixed height
@@ -318,7 +312,7 @@ struct TranslationPanelView: View {
     }
 }
 
-// MARK: - Panel Style Modifier
+// MARK: - View Modifiers
 
 extension View {
     /// Applies the standard translation panel styling.
@@ -336,6 +330,15 @@ extension View {
                     .strokeBorder(GlimpseTheme.Colors.panelBorder, lineWidth: 1)
             )
             .padding(GlimpseTheme.Spacing.xl)
+    }
+
+    /// Applies standard scroll section styling with a maximum height constraint.
+    func constrainedScrollSection(maxHeight: CGFloat) -> some View {
+        self
+            .frame(maxHeight: maxHeight)
+            .fixedSize(horizontal: false, vertical: true)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.automatic)
     }
 }
 
