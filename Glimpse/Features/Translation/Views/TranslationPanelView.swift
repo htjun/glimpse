@@ -90,6 +90,7 @@ struct TranslationPanelView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxHeight: GlimpseTheme.Sizing.panelMaxHeight)
                 .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicators(.automatic)
 
                 if hasResult {
                     footerSection
