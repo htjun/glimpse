@@ -21,8 +21,12 @@ final class AccessibilityService {
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "Glimpse", category: "AccessibilityService")
 
-    /// Wait time for clipboard to update after simulating Cmd+C
-    private let clipboardWaitTime: Duration = .milliseconds(100)
+    /// Wait times for clipboard capture with increasing delays for retry
+    private let clipboardWaitTimes: [Duration] = [
+        .milliseconds(100),
+        .milliseconds(150),
+        .milliseconds(200)
+    ]
 
     // MARK: - Initialization
 
@@ -32,6 +36,7 @@ final class AccessibilityService {
 
     /// Captures the currently selected text by simulating Cmd+C.
     /// Preserves the user's original clipboard contents.
+    /// Uses retry with increasing delays for reliability on slower systems.
     /// - Returns: The selected text, or `nil` if no text is selected or capture fails.
     func captureSelectedText() async -> String? {
         let pasteboard = NSPasteboard.general
@@ -43,13 +48,18 @@ final class AccessibilityService {
         // Simulate Cmd+C to copy selected text
         simulateCopy()
 
-        // Wait for clipboard to update
-        try? await Task.sleep(for: clipboardWaitTime)
-
-        // Read captured text
+        // Try waiting with increasing delays
         var capturedText: String?
-        if pasteboard.changeCount != originalChangeCount {
-            capturedText = pasteboard.string(forType: .string)
+        for (index, waitTime) in clipboardWaitTimes.enumerated() {
+            try? await Task.sleep(for: waitTime)
+
+            if pasteboard.changeCount != originalChangeCount {
+                capturedText = pasteboard.string(forType: .string)
+                if capturedText != nil && !capturedText!.isEmpty {
+                    logger.debug("Captured text on attempt \(index + 1)")
+                    break
+                }
+            }
         }
 
         // Restore original clipboard contents
@@ -60,7 +70,7 @@ final class AccessibilityService {
             return text
         }
 
-        logger.debug("No text captured (clipboard unchanged or empty)")
+        logger.debug("No text captured after \(clipboardWaitTimes.count) attempts")
         return nil
     }
 

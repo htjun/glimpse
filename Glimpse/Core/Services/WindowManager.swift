@@ -128,15 +128,22 @@ final class WindowManager: NSObject, NSWindowDelegate {
             hostingView.layoutSubtreeIfNeeded()
         }
 
-        let contentSize = panel.contentView?.fittingSize ?? CGSize(width: 480, height: 200)
-        panel.setContentSize(contentSize)
+        // Defer sizing to next run loop to ensure SwiftUI layout is complete
+        DispatchQueue.main.async { [weak panel, weak screen] in
+            guard let panel, let screen else { return }
 
-        let screenFrame = screen.visibleFrame
-        let origin = NSPoint(
-            x: screenFrame.midX - contentSize.width / 2,
-            y: screenFrame.midY - contentSize.height / 2 + 100
-        )
-        panel.setFrameOrigin(origin)
+            let contentSize = panel.contentView?.fittingSize ?? CGSize(width: 480, height: 200)
+            panel.setContentSize(contentSize)
+
+            let screenFrame = screen.visibleFrame
+            // Position panel above center for better visibility
+            let verticalOffset: CGFloat = 100
+            let origin = NSPoint(
+                x: screenFrame.midX - contentSize.width / 2,
+                y: screenFrame.midY - contentSize.height / 2 + verticalOffset
+            )
+            panel.setFrameOrigin(origin)
+        }
     }
 
     /// Installs a global mouse monitor to detect clicks outside the panel.
@@ -144,8 +151,11 @@ final class WindowManager: NSObject, NSWindowDelegate {
         removeMouseMonitor()
 
         mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { [weak self] _ in
-            Task { @MainActor in
-                guard let self, let panel = self.panel, self.isPanelIntendedOpen else { return }
+            guard let self else { return }
+
+            // Dispatch to main actor for thread safety
+            DispatchQueue.main.async {
+                guard let panel = self.panel, self.isPanelIntendedOpen else { return }
 
                 let clickLocation = NSEvent.mouseLocation
                 if !panel.frame.contains(clickLocation) {
