@@ -20,11 +20,26 @@ enum GlimpseTheme {
         /// Button border for secondary buttons
         static let buttonBorder = Color.gray.opacity(0.3)
 
+        /// Disabled button background
+        static let buttonDisabled = Color(red: 203 / 255, green: 203 / 255, blue: 203 / 255)
+
+        /// Secondary button pressed background
+        static let buttonPressedBackground = Color.gray.opacity(0.1)
+
         /// Disabled/loading text
         static let textDisabled = Color.primary.opacity(0.6)
 
+        /// Error icon color
+        static let errorIcon = Color.orange
+
         /// Error background tint
         static let errorBackground = Color.orange.opacity(0.1)
+
+        /// Info icon color
+        static let infoIcon = Color.secondary
+
+        /// Info background tint
+        static let infoBackground = Color.secondary.opacity(0.1)
     }
 
     // MARK: - Spacing
@@ -49,11 +64,20 @@ enum GlimpseTheme {
     enum Typography {
         private static let fontFamily = "Geist"
 
-        static let body = Font.custom("\(fontFamily)-Regular", size: 16)
-        static let caption = Font.custom("\(fontFamily)-Regular", size: 14)
-        static let footnote = Font.custom("\(fontFamily)-Medium", size: 12)
-        static let buttonPrimary = Font.custom("\(fontFamily)-SemiBold", size: 13)
-        static let buttonSecondary = Font.custom("\(fontFamily)-Medium", size: 11)
+        /// Body text with system font fallback
+        static let body = Font.custom("\(fontFamily)-Regular", size: 16, relativeTo: .body)
+
+        /// Caption text with system font fallback
+        static let caption = Font.custom("\(fontFamily)-Regular", size: 14, relativeTo: .callout)
+
+        /// Footnote text with system font fallback
+        static let footnote = Font.custom("\(fontFamily)-Medium", size: 12, relativeTo: .footnote)
+
+        /// Primary button text with system font fallback
+        static let buttonPrimary = Font.custom("\(fontFamily)-SemiBold", size: 13, relativeTo: .subheadline)
+
+        /// Secondary button text with system font fallback
+        static let buttonSecondary = Font.custom("\(fontFamily)-Medium", size: 11, relativeTo: .caption)
     }
 
     // MARK: - Sizing

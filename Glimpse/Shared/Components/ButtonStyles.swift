@@ -40,7 +40,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     private func backgroundColor(isPressed: Bool) -> Color {
         if isLoading { return GlimpseTheme.Colors.panelBackground }
-        if !isEnabled { return Color(red: 203 / 255, green: 203 / 255, blue: 203 / 255) }
+        if !isEnabled { return GlimpseTheme.Colors.buttonDisabled }
         return isPressed ? Color.black.opacity(0.7) : .black
     }
 }
@@ -57,7 +57,7 @@ struct SecondaryButtonStyle: ButtonStyle {
             .padding(.vertical, GlimpseTheme.Spacing.sm)
             .background(
                 RoundedRectangle(cornerRadius: GlimpseTheme.Radii.small)
-                    .fill(configuration.isPressed ? Color.gray.opacity(0.1) : Color.clear)
+                    .fill(configuration.isPressed ? GlimpseTheme.Colors.buttonPressedBackground : Color.clear)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: GlimpseTheme.Radii.small)

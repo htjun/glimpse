@@ -42,14 +42,14 @@ struct TranslationResultView: View {
     private func messageSection(_ message: String, isError: Bool) -> some View {
         HStack {
             Image(systemName: isError ? "exclamationmark.triangle.fill" : "info.circle.fill")
-                .foregroundStyle(isError ? .orange : .secondary)
+                .foregroundStyle(isError ? GlimpseTheme.Colors.errorIcon : GlimpseTheme.Colors.infoIcon)
             Text(message)
                 .font(GlimpseTheme.Typography.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(GlimpseTheme.Spacing.md)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isError ? GlimpseTheme.Colors.errorBackground : Color.secondary.opacity(0.1))
+        .background(isError ? GlimpseTheme.Colors.errorBackground : GlimpseTheme.Colors.infoBackground)
         .clipShape(RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard))
     }
 }
