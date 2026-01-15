@@ -176,7 +176,7 @@ struct TranslationPanelView: View {
         Self.logger.info("Panel opened, captured text: \(text != nil ? "yes" : "no")")
         resetState()
         if let text {
-            inputText = text
+            inputText = text.trimmingCharacters(in: .whitespacesAndNewlines)
             performLookup()
         }
     }
