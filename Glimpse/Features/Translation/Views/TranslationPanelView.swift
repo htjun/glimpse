@@ -75,7 +75,8 @@ struct TranslationPanelView: View {
 
                 // Button - fixed height
                 translateButtonWithDivider
-                    .padding(.bottom, hasResult ? 0 : GlimpseTheme.Spacing.lg)
+                    .padding(.top, hasResult ? GlimpseTheme.Spacing.lg : 0)
+                    .padding(.bottom, GlimpseTheme.Spacing.lg)
 
                 // Result section - scrollable, max 500px
                 if hasResult || translationError != nil {
