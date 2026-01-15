@@ -31,6 +31,8 @@ struct TranslationInputView: View {
                     selection = TextSelection(insertionPoint: inputText.endIndex)
                 }
             }
+            .accessibilityLabel("Text to translate")
+            .accessibilityHint("Enter text you want to translate")
     }
 }
 

@@ -43,6 +43,7 @@ struct TranslationResultView: View {
         HStack {
             Image(systemName: isError ? "exclamationmark.triangle.fill" : "info.circle.fill")
                 .foregroundStyle(isError ? GlimpseTheme.Colors.errorIcon : GlimpseTheme.Colors.infoIcon)
+                .accessibilityHidden(true)
             Text(message)
                 .font(GlimpseTheme.Typography.caption)
                 .foregroundStyle(.secondary)
@@ -51,6 +52,8 @@ struct TranslationResultView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(isError ? GlimpseTheme.Colors.errorBackground : GlimpseTheme.Colors.infoBackground)
         .clipShape(RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(isError ? "Error: \(message)" : "Info: \(message)")
     }
 }
 

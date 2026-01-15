@@ -25,6 +25,7 @@ struct TranslationFooterView: View {
             Text("\(sourceLanguage.shortName) \u{2192} \(targetLanguage.shortName)")
                 .font(GlimpseTheme.Typography.footnote)
                 .foregroundStyle(.secondary)
+                .accessibilityLabel("Translation direction: \(sourceLanguage.displayName) to \(targetLanguage.displayName)")
         }
     }
 }
@@ -45,5 +46,7 @@ private struct ActionButton: View {
             }
         }
         .buttonStyle(SecondaryButtonStyle())
+        .accessibilityLabel(title)
+        .accessibilityHint("Press Command+\(shortcut) to \(title.lowercased())")
     }
 }

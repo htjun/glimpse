@@ -171,6 +171,8 @@ struct TranslationPanelView: View {
                 .buttonStyle(PrimaryButtonStyle(isLoading: state.isTranslating))
                 .keyboardShortcut(.return, modifiers: .command)
                 .disabled(state.isTranslating || state.inputText.isEmpty)
+                .accessibilityLabel(state.isTranslating ? "Translating in progress" : "Translate")
+                .accessibilityHint("Press Command+Return to translate the entered text")
         }
     }
 
