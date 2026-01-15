@@ -87,8 +87,6 @@ struct TranslationPanelView: View {
                         }
                     }
                 }
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxHeight: GlimpseTheme.Sizing.panelMaxHeight)
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.automatic)
 
@@ -96,6 +94,7 @@ struct TranslationPanelView: View {
                     footerSection
                 }
             }
+            .frame(maxHeight: GlimpseTheme.Sizing.panelMaxHeight)
         }
         .panelStyle()
         .onAppear {
