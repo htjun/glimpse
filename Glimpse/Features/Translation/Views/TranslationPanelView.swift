@@ -62,39 +62,45 @@ struct TranslationPanelView: View {
             escapeHandler
 
             VStack(spacing: 0) {
+                // Input section - scrollable, max 200px
                 ScrollView {
-                    VStack(spacing: GlimpseTheme.Spacing.lg) {
-                        // Input section with padding
-                        TranslationInputView(
-                            inputText: $inputText,
-                            onSubmit: performLookup
-                        )
-                        .padding(.horizontal, GlimpseTheme.Spacing.lg)
-                        .padding(.top, GlimpseTheme.Spacing.lg)
-
-                        // Button with edge-to-edge divider
-                        translateButtonWithDivider
-                            .padding(.bottom, hasResult ? 0 : GlimpseTheme.Spacing.lg)
-
-                        // Result section with padding (only when there's content)
-                        if hasResult || translationError != nil {
-                            TranslationResultView(
-                                result: translatedText,
-                                error: translationError
-                            )
-                            .padding(.horizontal, GlimpseTheme.Spacing.lg)
-                            .padding(.bottom, GlimpseTheme.Spacing.lg)
-                        }
-                    }
+                    TranslationInputView(
+                        inputText: $inputText,
+                        onSubmit: performLookup
+                    )
+                    .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                    .padding(.top, GlimpseTheme.Spacing.lg)
                 }
+                .frame(maxHeight: 200)
+                .fixedSize(horizontal: false, vertical: true)
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.automatic)
 
+                // Button - fixed height
+                translateButtonWithDivider
+                    .padding(.bottom, hasResult ? 0 : GlimpseTheme.Spacing.lg)
+
+                // Result section - scrollable, max 500px
+                if hasResult || translationError != nil {
+                    ScrollView {
+                        TranslationResultView(
+                            result: translatedText,
+                            error: translationError
+                        )
+                        .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                        .padding(.bottom, GlimpseTheme.Spacing.lg)
+                    }
+                    .frame(maxHeight: 500)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .scrollBounceBehavior(.basedOnSize)
+                    .scrollIndicators(.automatic)
+                }
+
+                // Footer - fixed height
                 if hasResult {
                     footerSection
                 }
             }
-            .frame(maxHeight: GlimpseTheme.Sizing.panelMaxHeight)
         }
         .panelStyle()
         .onAppear {
