@@ -70,7 +70,7 @@ final class AccessibilityService {
             return text
         }
 
-        logger.debug("No text captured after \(clipboardWaitTimes.count) attempts")
+        logger.debug("No text captured after \(self.clipboardWaitTimes.count) attempts")
         return nil
     }
 
