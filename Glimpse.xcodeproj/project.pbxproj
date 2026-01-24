@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E94D407F2F24A9CE00CC8907 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = E94D407E2F24A9CE00CC8907 /* MLXLLM */; };
+		E94D40812F24A9CE00CC8907 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = E94D40802F24A9CE00CC8907 /* MLXLMCommon */; };
 		E9EBFAD52F107ED000D6CA79 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = E9EBFA192F10730900D6CA79 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +45,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E94D407F2F24A9CE00CC8907 /* MLXLLM in Frameworks */,
+				E94D40812F24A9CE00CC8907 /* MLXLMCommon in Frameworks */,
 				E9EBFAD52F107ED000D6CA79 /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +100,8 @@
 			name = Glimpse;
 			packageProductDependencies = (
 				E9EBFA192F10730900D6CA79 /* KeyboardShortcuts */,
+				E94D407E2F24A9CE00CC8907 /* MLXLLM */,
+				E94D40802F24A9CE00CC8907 /* MLXLMCommon */,
 			);
 			productName = Glimpse;
 			productReference = E9EBF9ED2F10730700D6CA79 /* Glimpse.app */;
@@ -154,6 +160,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				E94D407D2F24A9CE00CC8907 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E9EBF9EE2F10730700D6CA79 /* Products */;
@@ -353,7 +360,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_CONCURRENCY = targeted;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
@@ -382,7 +389,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_CONCURRENCY = targeted;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
@@ -455,6 +462,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = LocalPackages/mlx-swift-lm;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -467,6 +481,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E94D407E2F24A9CE00CC8907 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLLM;
+		};
+		E94D40802F24A9CE00CC8907 /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
+		};
 		E9EBFA192F10730900D6CA79 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;

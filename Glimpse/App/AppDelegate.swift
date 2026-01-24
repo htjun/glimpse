@@ -31,6 +31,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logger.info("Glimpse launched")
         checkAccessibilityPermissions()
         registerGlobalHotkey()
+        autoLoadLocalLLMIfNeeded()
+    }
+
+    private func autoLoadLocalLLMIfNeeded() {
+        Task {
+            await LocalLLMService.shared.autoLoadIfNeeded()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

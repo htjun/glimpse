@@ -19,6 +19,9 @@ struct SettingsView: View {
     @AppStorage(LanguageSettingsKey.languageTwo)
     private var languageTwo: SupportedLanguage = .korean
 
+    @AppStorage(LocalLLMSettingsKey.translationBackend)
+    private var selectedBackend: TranslationBackendType = .apple
+
     // MARK: - Body
 
     var body: some View {
@@ -30,9 +33,13 @@ struct SettingsView: View {
             Section("Languages") {
                 languagePairRow
             }
+
+            Section("Translation Engine") {
+                TranslationEngineSettingsView(selectedBackend: $selectedBackend)
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 350)
+        .frame(width: 400)
     }
 
     // MARK: - View Components

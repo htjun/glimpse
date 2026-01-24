@@ -65,8 +65,8 @@ struct TranslationPanelView: View {
 
     @State private var state = TranslationState()
 
-    /// Configuration for the Translation API session.
-    /// When set/invalidated, triggers the .translationTask modifier.
+    /// Configuration for the Apple Translation API session.
+    /// Only used when Apple Translation backend is selected.
     @State private var translationConfiguration: TranslationSession.Configuration?
 
     @AppStorage(LanguageSettingsKey.languageOne)
@@ -74,6 +74,9 @@ struct TranslationPanelView: View {
 
     @AppStorage(LanguageSettingsKey.languageTwo)
     private var languageTwo: SupportedLanguage = .korean
+
+    @AppStorage(LocalLLMSettingsKey.translationBackend)
+    private var selectedBackend: TranslationBackendType = .apple
 
     // MARK: - Body
 
@@ -123,6 +126,7 @@ struct TranslationPanelView: View {
             handlePanelOpen(text: initialText)
         }
         .translationTask(translationConfiguration) { @Sendable session in
+            // Only used when Apple Translation backend is selected
             let textToTranslate = await MainActor.run { state.inputText }
 
             do {
@@ -262,7 +266,7 @@ struct TranslationPanelView: View {
         return definition
     }
 
-    /// Triggers translation by setting/invalidating the configuration.
+    /// Triggers translation using the configured backend.
     private func triggerTranslation() {
         guard !state.inputText.isEmpty else { return }
 
@@ -270,17 +274,57 @@ struct TranslationPanelView: View {
         state.translationError = nil
 
         let targetLanguage = determineTargetLanguage(for: state.inputText)
+        state.currentConfigTarget = targetLanguage
 
+        switch selectedBackend {
+        case .apple:
+            // Use Apple Translation API via .translationTask modifier
+            triggerAppleTranslation(to: targetLanguage)
+        case .localLLM:
+            // Use Local LLM via TranslationCoordinator
+            triggerLocalLLMTranslation(to: targetLanguage)
+        }
+    }
+
+    /// Triggers Apple Translation API by setting/invalidating the configuration.
+    private func triggerAppleTranslation(to targetLanguage: SupportedLanguage) {
         // If we have a config with the same target, just invalidate to re-run
         if translationConfiguration != nil && state.currentConfigTarget == targetLanguage {
             translationConfiguration?.invalidate()
         } else {
             // Need a new config for different target language
-            state.currentConfigTarget = targetLanguage
             translationConfiguration = TranslationSession.Configuration(
                 source: nil,
                 target: targetLanguage.localeLanguage
             )
+        }
+    }
+
+    /// Triggers Local LLM translation via TranslationCoordinator.
+    private func triggerLocalLLMTranslation(to targetLanguage: SupportedLanguage) {
+        let sourceLanguage = state.isAutoDetect ? nil : languageOne
+
+        Task {
+            do {
+                let result = try await LocalLLMTranslationBackend.shared.translate(
+                    text: state.inputText,
+                    from: sourceLanguage,
+                    to: targetLanguage
+                )
+
+                state.translatedText = result.translatedText
+                state.translationError = nil
+
+                if let detected = result.detectedSourceLanguage {
+                    state.detectedSourceLanguage = detected
+                }
+            } catch {
+                state.translationError = error.localizedDescription
+                state.translatedText = ""
+                Self.logger.error("Local LLM translation failed: \(error.localizedDescription)")
+            }
+
+            state.isTranslating = false
         }
     }
 
@@ -309,7 +353,7 @@ struct TranslationPanelView: View {
 
     /// Re-triggers translation if there's existing input text.
     private func retranslateIfNeeded() {
-        guard !state.inputText.isEmpty, translationConfiguration != nil else { return }
+        guard !state.inputText.isEmpty else { return }
         triggerTranslation()
     }
 

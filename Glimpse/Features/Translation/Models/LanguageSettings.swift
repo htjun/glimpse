@@ -108,3 +108,38 @@ enum LanguageSettingsKey {
     static let languageOne = "languageOne"
     static let languageTwo = "languageTwo"
 }
+
+// MARK: - Local LLM Settings
+
+/// Keys for Local LLM settings.
+enum LocalLLMSettingsKey {
+    static let translationBackend = "translationBackend"
+    static let selectedModel = "localLLMSelectedModel"
+    static let wasModelLoaded = "localLLMWasModelLoaded"
+}
+
+/// Available translation backends.
+enum TranslationBackendType: String, CaseIterable, Identifiable, Codable {
+    case apple = "apple"
+    case localLLM = "localLLM"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .apple:
+            return "Apple Translation"
+        case .localLLM:
+            return "TranslateGemma (Local)"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .apple:
+            return "Uses Apple's built-in Translation API. Fast and reliable."
+        case .localLLM:
+            return "Uses locally-running TranslateGemma model. Works fully offline after download."
+        }
+    }
+}
