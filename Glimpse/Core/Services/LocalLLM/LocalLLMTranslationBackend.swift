@@ -42,20 +42,7 @@ final class LocalLLMTranslationBackend: TranslationBackend, @unchecked Sendable 
     ) async throws -> TranslationResult {
         // Wait for model to be ready (handles loading state)
         if !isReady {
-            let modelState = LocalLLMService.shared.modelState
-            if modelState == .notDownloaded {
-                throw TranslationBackendError.modelNotDownloaded
-            }
-            if case .error = modelState {
-                throw TranslationBackendError.modelNotLoaded
-            }
-
-            // Model is loading or downloaded - wait for it to become ready
-            logger.info("Waiting for model to become ready...")
-            let ready = await LocalLLMService.shared.waitForReady(timeout: 60)
-            if !ready {
-                throw TranslationBackendError.modelNotLoaded
-            }
+            try await ensureModelReady()
         }
 
         // Detect source language if not provided
@@ -80,6 +67,27 @@ final class LocalLLMTranslationBackend: TranslationBackend, @unchecked Sendable 
     }
 
     // MARK: - Private Methods
+
+    /// Ensures the model is ready, waiting if necessary.
+    private func ensureModelReady() async throws {
+        let modelState = LocalLLMService.shared.modelState
+
+        switch modelState {
+        case .notDownloaded:
+            throw TranslationBackendError.modelNotDownloaded
+        case .error:
+            throw TranslationBackendError.modelNotLoaded
+        case .ready:
+            return
+        case .loading, .downloading, .downloaded:
+            // Model is loading or downloaded - wait for it to become ready
+            logger.info("Waiting for model to become ready...")
+            let ready = await LocalLLMService.shared.waitForReady(timeout: 60)
+            if !ready {
+                throw TranslationBackendError.modelNotLoaded
+            }
+        }
+    }
 
     private func detectLanguage(_ text: String) -> SupportedLanguage? {
         let recognizer = NLLanguageRecognizer()

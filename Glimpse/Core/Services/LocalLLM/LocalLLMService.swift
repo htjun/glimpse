@@ -332,9 +332,9 @@ final class LocalLLMService {
 
     /// Cleans up the generated output by removing special tokens.
     private func extractTranslation(from output: String) -> String {
-        var result = output.trimmingCharacters(in: .whitespacesAndNewlines)
+        var result = output
 
-        // Remove end-of-turn token if present
+        // Remove end-of-turn token and everything after it
         if let range = result.range(of: "<end_of_turn>") {
             result = String(result[..<range.lowerBound])
         }

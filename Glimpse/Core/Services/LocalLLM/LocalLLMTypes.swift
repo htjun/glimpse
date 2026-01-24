@@ -73,7 +73,7 @@ enum LocalLLMModelState: Equatable, Sendable {
     }
 
     var canTranslate: Bool {
-        self == .ready
+        isReady
     }
 
     var statusText: String {

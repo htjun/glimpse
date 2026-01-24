@@ -95,10 +95,10 @@ struct LanguageSelectorView: View {
     }
 
     private var iconName: String {
-        if isSourceMode {
-            return isAutoDetect ? "sparkles" : "text.bubble"
+        if mode == .target {
+            return "text.bubble.fill"
         }
-        return "text.bubble.fill"
+        return isAutoDetect ? "sparkles" : "text.bubble"
     }
 
     private var iconColor: Color {
