@@ -40,6 +40,23 @@ enum GlimpseTheme {
 
         /// Info background tint
         static let infoBackground = Color.secondary.opacity(0.1)
+
+        // MARK: Two-Column Layout Colors
+
+        /// Source column background - light blue tint
+        static let sourceColumnBackground = Color(red: 240 / 255, green: 244 / 255, blue: 252 / 255)
+
+        /// Target column background - warm cream
+        static let targetColumnBackground = Color(red: 250 / 255, green: 249 / 255, blue: 246 / 255)
+
+        /// Swap button background
+        static let swapButtonBackground = Color(white: 0.95)
+
+        /// Placeholder text color
+        static let placeholderText = Color.gray.opacity(0.4)
+
+        /// Header/footer background
+        static let headerBackground = Color(white: 0.97)
     }
 
     // MARK: - Spacing
@@ -87,5 +104,25 @@ enum GlimpseTheme {
         static let panelMaxHeight: CGFloat = 800
         static let primaryButtonHeight: CGFloat = 32
         static let primaryButtonMinWidth: CGFloat = 100
+
+        // MARK: Two-Column Layout Sizing
+
+        /// Width for the two-column panel
+        static let twoColumnPanelWidth: CGFloat = 720
+
+        /// Minimum width for each column
+        static let columnMinWidth: CGFloat = 320
+
+        /// Header height
+        static let headerHeight: CGFloat = 48
+
+        /// Footer height
+        static let footerHeight: CGFloat = 44
+
+        /// Swap button size
+        static let swapButtonSize: CGFloat = 36
+
+        /// Minimum height for text areas
+        static let textAreaMinHeight: CGFloat = 280
     }
 }

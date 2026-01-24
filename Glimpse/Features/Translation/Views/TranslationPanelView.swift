@@ -27,6 +27,7 @@ private struct TranslationState {
     var translationError: String?
     var detectedSourceLanguage: SupportedLanguage?
     var currentConfigTarget: SupportedLanguage?
+    var isAutoDetect: Bool = true
 
     /// Resets all state for a fresh panel open.
     mutating func reset() {
@@ -36,10 +37,12 @@ private struct TranslationState {
         translationError = nil
         detectedSourceLanguage = nil
         currentConfigTarget = nil
+        isAutoDetect = true
     }
 }
 
 /// Main translation panel view - floating window activated by hotkey.
+/// Two-column layout matching Apple Translate app design.
 struct TranslationPanelView: View {
 
     // MARK: - Constants
@@ -75,46 +78,47 @@ struct TranslationPanelView: View {
     // MARK: - Body
 
     var body: some View {
-        ZStack {
-            escapeHandler
+        VStack(spacing: 0) {
+            // Header with language selectors and swap button
+            TranslationHeaderView(
+                sourceLanguage: $languageOne,
+                targetLanguage: $languageTwo,
+                detectedLanguage: state.detectedSourceLanguage,
+                isAutoDetect: $state.isAutoDetect,
+                onSwap: swapLanguages
+            )
 
-            VStack(spacing: 0) {
-                // Input section - scrollable, max 200px
-                ScrollView {
-                    TranslationInputView(
+            Divider()
+
+            // Two-column content area with unified scroll
+            ScrollView {
+                HStack(spacing: 0) {
+                    SourceColumnView(
                         inputText: $state.inputText,
                         onSubmit: performLookup
                     )
-                    .padding(.horizontal, GlimpseTheme.Spacing.lg)
-                    .padding(.top, GlimpseTheme.Spacing.lg)
-                }
-                .constrainedScrollSection(maxHeight: 200)
 
-                // Button - fixed height
-                translateButtonWithDivider
-                    .padding(.top, hasResult ? GlimpseTheme.Spacing.lg : 0)
-                    .padding(.bottom, GlimpseTheme.Spacing.lg)
+                    Divider()
 
-                // Result section - scrollable, max 500px
-                if hasResult || state.translationError != nil {
-                    ScrollView {
-                        TranslationResultView(
-                            result: state.translatedText,
-                            error: state.translationError
-                        )
-                        .padding(.horizontal, GlimpseTheme.Spacing.lg)
-                        .padding(.bottom, GlimpseTheme.Spacing.lg)
-                    }
-                    .constrainedScrollSection(maxHeight: 500)
-                }
-
-                // Footer - fixed height
-                if hasResult {
-                    footerSection
+                    TargetColumnView(
+                        translatedText: state.translatedText,
+                        isTranslating: state.isTranslating,
+                        error: state.translationError
+                    )
                 }
             }
+            .scrollBounceBehavior(.basedOnSize)
+
+            Divider()
+
+            // Footer with app branding and copy button
+            TranslationFooterView(
+                hasTranslation: hasResult,
+                onCopy: copyTranslation
+            )
         }
-        .panelStyle()
+        .twoColumnPanelStyle()
+        .overlay { keyboardHandlers }
         .onAppear {
             handlePanelOpen(text: initialText)
         }
@@ -125,7 +129,6 @@ struct TranslationPanelView: View {
                 let response = try await session.translate(textToTranslate)
                 await MainActor.run {
                     if response.targetText.isEmpty || response.targetText == textToTranslate {
-                        // No meaningful translation found
                         state.translationError = TranslationError.noTranslationFound
                         state.translatedText = ""
                     } else {
@@ -154,39 +157,20 @@ struct TranslationPanelView: View {
 
     // MARK: - View Components
 
-    private var escapeHandler: some View {
-        Button("") { WindowManager.shared.closePanel() }
-            .keyboardShortcut(.escape, modifiers: [])
-            .hidden()
-            .frame(width: 0, height: 0)
-    }
-
-    private var translateButtonWithDivider: some View {
-        ZStack {
-            if hasResult {
-                Divider()
-            }
-
-            Button(state.isTranslating ? "Translating.." : "Translate", action: performLookup)
-                .buttonStyle(PrimaryButtonStyle(isLoading: state.isTranslating))
-                .keyboardShortcut(.return, modifiers: .command)
-                .disabled(state.isTranslating || state.inputText.isEmpty)
-                .accessibilityLabel(state.isTranslating ? "Translating in progress" : "Translate")
-                .accessibilityHint("Press Command+Return to translate the entered text")
-        }
-    }
-
-    private var footerSection: some View {
+    /// Hidden buttons for keyboard shortcuts
+    private var keyboardHandlers: some View {
         Group {
-            TranslationFooterView(
-                sourceLanguage: state.detectedSourceLanguage ?? languageOne,
-                targetLanguage: state.currentConfigTarget ?? languageTwo,
-                onCopy: copyTranslation,
-                onReplace: replaceOriginalText
-            )
-            .padding(.horizontal, GlimpseTheme.Spacing.lg)
-            .padding(.vertical, GlimpseTheme.Spacing.md)
+            // Escape to close
+            Button("") { WindowManager.shared.closePanel() }
+                .keyboardShortcut(.escape, modifiers: [])
+
+            // Command+Return to copy translation
+            Button("") { copyTranslation() }
+                .keyboardShortcut(.return, modifiers: .command)
+                .disabled(!hasResult)
         }
+        .hidden()
+        .frame(width: 0, height: 0)
     }
 
     // MARK: - Private Methods
@@ -200,6 +184,28 @@ struct TranslationPanelView: View {
             state.inputText = text.trimmingCharacters(in: .whitespacesAndNewlines)
             performLookup()
         }
+    }
+
+    /// Swaps source and target languages.
+    private func swapLanguages() {
+        // Get the effective source language (detected or explicit)
+        let effectiveSource = state.isAutoDetect
+            ? (state.detectedSourceLanguage ?? languageOne)
+            : languageOne
+
+        // Swap
+        languageOne = languageTwo
+        languageTwo = effectiveSource
+
+        // After swap, turn off auto-detect since user explicitly chose
+        state.isAutoDetect = false
+
+        // Re-translate if we have text
+        if !state.inputText.isEmpty {
+            triggerTranslation()
+        }
+
+        Self.logger.info("Swapped languages: \(languageOne.displayName) -> \(languageTwo.displayName)")
     }
 
     /// Performs lookup by trying bilingual dictionary first for single words, then falling back to translation.
@@ -309,22 +315,34 @@ struct TranslationPanelView: View {
 
     /// Copies the translated text to the clipboard.
     private func copyTranslation() {
+        guard hasResult else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(state.translatedText, forType: .string)
         Self.logger.info("Translation copied to clipboard")
-    }
-
-    /// Replaces the original selected text with the translation.
-    private func replaceOriginalText() {
-        // TODO: Implement replace functionality using accessibility APIs
-        Self.logger.info("Replace requested (not yet implemented)")
     }
 }
 
 // MARK: - View Modifiers
 
 extension View {
-    /// Applies the standard translation panel styling.
+    /// Applies the two-column translation panel styling.
+    func twoColumnPanelStyle() -> some View {
+        self
+            .frame(width: GlimpseTheme.Sizing.twoColumnPanelWidth, alignment: .top)
+            .clipShape(RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard))
+            .background(
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .fill(GlimpseTheme.Colors.panelBackground)
+                    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                    .strokeBorder(GlimpseTheme.Colors.panelBorder, lineWidth: 1)
+            )
+            .padding(GlimpseTheme.Spacing.xl)
+    }
+
+    /// Applies the standard translation panel styling (legacy).
     func panelStyle() -> some View {
         self
             .frame(width: GlimpseTheme.Sizing.panelWidth, alignment: .top)

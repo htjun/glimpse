@@ -132,7 +132,7 @@ final class WindowManager: NSObject, NSWindowDelegate {
         DispatchQueue.main.async { [weak panel, weak screen] in
             guard let panel, let screen else { return }
 
-            let contentSize = panel.contentView?.fittingSize ?? CGSize(width: 480, height: 200)
+            let contentSize = panel.contentView?.fittingSize ?? CGSize(width: 720, height: 400)
             panel.setContentSize(contentSize)
 
             let screenFrame = screen.visibleFrame
