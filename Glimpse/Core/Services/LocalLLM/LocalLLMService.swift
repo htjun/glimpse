@@ -230,7 +230,15 @@ final class LocalLLMService {
         logger.info("Model deleted")
     }
 
-    /// Generates translation using TranslateGemma structured messages format.
+    /// Generates translation using TranslateGemma with manual prompt construction.
+    ///
+    /// Note: We bypass `applyChatTemplate()` because swift-transformers 1.1.6 doesn't support
+    /// loading external `chat_template.jinja` files. TranslateGemma stores its complex template
+    /// (17KB with 600+ language mappings) in an external file, causing the library to fall back
+    /// to a generic Gemma template that produces malformed prompts.
+    ///
+    /// Instead, we manually construct prompts using Gemma 3's chat format.
+    /// See: https://github.com/huggingface/swift-transformers/issues/204
     func translate(
         text: String,
         from source: SupportedLanguage,
@@ -241,30 +249,18 @@ final class LocalLLMService {
             throw TranslationBackendError.modelNotLoaded
         }
 
-        // Build TranslateGemma structured messages format
-        // TranslateGemma requires: source_lang_code, target_lang_code, text in content
-        let contentItem: [String: any Sendable] = [
-            "type": "text",
-            "source_lang_code": source.rawValue,
-            "target_lang_code": target.rawValue,
-            "text": text
-        ]
-
-        let messages: [Message] = [
-            [
-                "role": "user",
-                "content": [contentItem] as [[String: any Sendable]]
-            ] as [String: any Sendable]
-        ]
+        // Build prompt manually using Gemma 3 chat format
+        let prompt = buildTranslateGemmaPrompt(text: text, from: source, to: target)
 
         logger.info("Starting translation generation...")
+        logger.debug("Prompt: \(prompt)")
 
         let result = try await container.perform { [logger] context in
-            let input = try await context.processor.prepare(
-                input: .init(messages: messages)
-            )
+            // Tokenize the prompt directly instead of using processor.prepare()
+            let tokens = context.tokenizer.encode(text: prompt)
+            let input = LMInput(tokens: MLXArray(tokens))
 
-            logger.debug("Input prepared, starting generation...")
+            logger.debug("Input prepared (\(tokens.count) tokens), starting generation...")
 
             var generatedText = ""
             var tokenCount = 0
@@ -297,6 +293,33 @@ final class LocalLLMService {
     }
 
     // MARK: - Private Methods
+
+    /// Builds a TranslateGemma prompt using Gemma 3 chat format.
+    ///
+    /// Format:
+    /// ```
+    /// <start_of_turn>user
+    /// Translate from [Source] to [Target]. Output only the translation.
+    ///
+    /// [text]<end_of_turn>
+    /// <start_of_turn>model
+    /// ```
+    ///
+    /// The language display names (e.g., "English", "Korean", "Chinese (Simplified)")
+    /// are compatible with TranslateGemma per the official documentation.
+    private func buildTranslateGemmaPrompt(
+        text: String,
+        from source: SupportedLanguage,
+        to target: SupportedLanguage
+    ) -> String {
+        """
+        <start_of_turn>user
+        Translate from \(source.displayName) to \(target.displayName). Output only the translation.
+
+        \(text)<end_of_turn>
+        <start_of_turn>model
+        """
+    }
 
     private func modelDirectoryPath(for model: LocalLLMModel) -> URL {
         // MLX Swift LM uses HubApi with downloadBase = ~/Library/Caches/
