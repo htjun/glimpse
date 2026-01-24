@@ -327,45 +327,20 @@ struct TranslationPanelView: View {
 extension View {
     /// Applies the two-column translation panel styling.
     func twoColumnPanelStyle() -> some View {
-        self
+        let cornerRadius = GlimpseTheme.Radii.standard
+        return self
             .frame(width: GlimpseTheme.Sizing.twoColumnPanelWidth, alignment: .top)
-            .clipShape(RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .background(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(GlimpseTheme.Colors.panelBackground)
                     .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                RoundedRectangle(cornerRadius: cornerRadius)
                     .strokeBorder(GlimpseTheme.Colors.panelBorder, lineWidth: 1)
             )
             .padding(GlimpseTheme.Spacing.xl)
-    }
-
-    /// Applies the standard translation panel styling (legacy).
-    func panelStyle() -> some View {
-        self
-            .frame(width: GlimpseTheme.Sizing.panelWidth, alignment: .top)
-            .clipShape(RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard))
-            .background(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
-                    .fill(GlimpseTheme.Colors.panelBackground)
-                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 4)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
-                    .strokeBorder(GlimpseTheme.Colors.panelBorder, lineWidth: 1)
-            )
-            .padding(GlimpseTheme.Spacing.xl)
-    }
-
-    /// Applies standard scroll section styling with a maximum height constraint.
-    func constrainedScrollSection(maxHeight: CGFloat) -> some View {
-        self
-            .frame(maxHeight: maxHeight)
-            .fixedSize(horizontal: false, vertical: true)
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.automatic)
     }
 }
 

@@ -20,16 +20,14 @@ struct TranslationHeaderView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            // Source language selector (left side)
             LanguageSelectorView(
                 mode: .source,
                 selectedLanguage: $sourceLanguage,
                 detectedLanguage: detectedLanguage,
-                isAutoDetect: isAutoDetect
+                isAutoDetect: $isAutoDetect
             )
             .frame(maxWidth: .infinity)
 
-            // Swap button (center)
             Button(action: onSwap) {
                 Image(systemName: "arrow.left.arrow.right")
             }
@@ -38,12 +36,11 @@ struct TranslationHeaderView: View {
             .accessibilityLabel("Swap languages")
             .accessibilityHint("Swaps source and target languages")
 
-            // Target language selector (right side)
             LanguageSelectorView(
                 mode: .target,
                 selectedLanguage: $targetLanguage,
                 detectedLanguage: nil,
-                isAutoDetect: false
+                isAutoDetect: .constant(false)
             )
             .frame(maxWidth: .infinity)
         }
