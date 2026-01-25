@@ -24,7 +24,6 @@ struct SourceColumnView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Language selector (top-left)
             LanguageSelectorView(
                 mode: .source,
                 selectedLanguage: $sourceLanguage,
@@ -34,18 +33,17 @@ struct SourceColumnView: View {
             .padding(.leading, GlimpseTheme.Spacing.lg)
             .padding(.top, GlimpseTheme.Spacing.lg)
 
-            // Text input area (scrollable)
             ScrollView(.vertical, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
-                    // Placeholder
                     if inputText.isEmpty {
                         Text("Enter text...")
                             .font(GlimpseTheme.Typography.body)
                             .foregroundStyle(GlimpseTheme.Colors.placeholderText)
+                            .padding(.leading, 5)  // Match TextEditor's internal padding
+                            .padding(.top, 8)      // Match TextEditor's internal padding
                             .allowsHitTesting(false)
                     }
 
-                    // Text editor
                     TextEditor(text: $inputText)
                         .font(GlimpseTheme.Typography.body)
                         .foregroundStyle(GlimpseTheme.Colors.textPrimary)
@@ -62,7 +60,6 @@ struct SourceColumnView: View {
             .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
             .fadingScrollbar()
 
-            // Settings button (bottom-left)
             Button(action: onOpenSettings) {}
                 .buttonStyle(SettingsButtonStyle())
                 .padding(.leading, GlimpseTheme.Spacing.sm)
@@ -81,9 +78,7 @@ struct SourceColumnView: View {
         .onAppear {
             isInputFocused = true
         }
-        .onSubmit {
-            onSubmit()
-        }
+        .onSubmit(onSubmit)
     }
 }
 
