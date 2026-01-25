@@ -202,10 +202,13 @@ struct TranslationPanelView: View {
     /// Returns the definition if found, or nil to fall back to translation.
     private func lookupBilingualDefinition(for word: String) -> String? {
         // Bilingual dictionaries are always paired with English
-        let nonEnglishLanguage: SupportedLanguage? = switch (languageOne, languageTwo) {
-        case (.english, let other): other
-        case (let other, .english): other
-        default: nil
+        let nonEnglishLanguage: SupportedLanguage?
+        if languageOne == .english {
+            nonEnglishLanguage = languageTwo
+        } else if languageTwo == .english {
+            nonEnglishLanguage = languageOne
+        } else {
+            nonEnglishLanguage = nil
         }
 
         guard let targetLang = nonEnglishLanguage,

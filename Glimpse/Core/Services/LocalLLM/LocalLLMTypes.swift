@@ -72,10 +72,6 @@ enum LocalLLMModelState: Equatable, Sendable {
         self == .ready
     }
 
-    var canTranslate: Bool {
-        isReady
-    }
-
     var statusText: String {
         switch self {
         case .notDownloaded:

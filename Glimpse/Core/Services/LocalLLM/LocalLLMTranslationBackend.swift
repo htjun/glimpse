@@ -70,9 +70,7 @@ final class LocalLLMTranslationBackend: TranslationBackend, @unchecked Sendable 
 
     /// Ensures the model is ready, waiting if necessary.
     private func ensureModelReady() async throws {
-        let modelState = LocalLLMService.shared.modelState
-
-        switch modelState {
+        switch LocalLLMService.shared.modelState {
         case .notDownloaded:
             throw TranslationBackendError.modelNotDownloaded
         case .error:
@@ -80,10 +78,8 @@ final class LocalLLMTranslationBackend: TranslationBackend, @unchecked Sendable 
         case .ready:
             return
         case .loading, .downloading, .downloaded:
-            // Model is loading or downloaded - wait for it to become ready
             logger.info("Waiting for model to become ready...")
-            let ready = await LocalLLMService.shared.waitForReady(timeout: 60)
-            if !ready {
+            guard await LocalLLMService.shared.waitForReady(timeout: 60) else {
                 throw TranslationBackendError.modelNotLoaded
             }
         }
