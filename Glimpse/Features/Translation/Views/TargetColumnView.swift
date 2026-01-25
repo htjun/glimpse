@@ -33,16 +33,20 @@ struct TargetColumnView: View {
             .padding(.top, GlimpseTheme.Spacing.lg)
 
             // Translation output area (scrollable)
+            // Show partial text during streaming for real-time feedback
             ScrollView(.vertical, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
-                    if isTranslating {
-                        loadingView
-                    } else if let error {
+                    if let error {
+                        // Error takes priority
                         errorView(error)
-                    } else if translatedText.isEmpty {
-                        placeholderView
-                    } else {
+                    } else if !translatedText.isEmpty {
+                        // Show text if available (even during streaming)
                         resultView
+                    } else if isTranslating {
+                        // Only show spinner before first token arrives
+                        loadingView
+                    } else {
+                        placeholderView
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

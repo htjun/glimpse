@@ -341,4 +341,112 @@ final class LocalLLMService {
 
         return result.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+
+    /// Removes partial `<end_of_turn>` token prefixes that may appear at the end of streaming chunks.
+    /// This prevents partial tokens like `<end_of_` or `<end_of_tu` from flashing in the UI.
+    private func removeEndTokenPrefix(from text: String) -> String {
+        let partialTokens = [
+            "<end_of_turn>",
+            "<end_of_turn",
+            "<end_of_tur",
+            "<end_of_tu",
+            "<end_of_t",
+            "<end_of_",
+            "<end_of",
+            "<end_o",
+            "<end_",
+            "<end",
+            "<en",
+            "<e",
+            "<",
+        ]
+
+        var result = text
+        for partial in partialTokens {
+            if result.hasSuffix(partial) {
+                result = String(result.dropLast(partial.count))
+                break
+            }
+        }
+        return result
+    }
+
+    // MARK: - Streaming Translation
+
+    #if canImport(MLXLLM)
+    /// Generates streaming translation using TranslateGemma.
+    ///
+    /// Returns an AsyncStream that yields text chunks as they are generated.
+    /// The stream automatically stops when `<end_of_turn>` is detected.
+    func translateStreaming(
+        text: String,
+        from source: SupportedLanguage,
+        to target: SupportedLanguage
+    ) async throws -> AsyncStream<String> {
+        guard let container = modelContainer, modelState == .ready else {
+            throw TranslationBackendError.modelNotLoaded
+        }
+
+        let prompt = buildTranslateGemmaPrompt(text: text, from: source, to: target)
+        logger.info("Starting streaming translation...")
+        logger.debug("Prompt: \(prompt)")
+
+        // Tokenize the prompt
+        let tokens = await container.encode(prompt)
+        let input = LMInput(tokens: MLXArray(tokens))
+
+        // Get the generation stream from the model
+        let generationStream = try await container.generate(
+            input: input,
+            parameters: GenerateParameters(maxTokens: 512, temperature: 0.3)
+        )
+
+        // Transform Generation stream to cleaned String stream
+        return AsyncStream<String> { [weak self] continuation in
+            Task { [weak self] in
+                var accumulatedText = ""
+
+                for await generation in generationStream {
+                    guard let self else {
+                        continuation.finish()
+                        return
+                    }
+
+                    switch generation {
+                    case .chunk(let chunk):
+                        accumulatedText += chunk
+
+                        // Check for end-of-turn token
+                        if accumulatedText.contains("<end_of_turn>") {
+                            let finalText = self.extractTranslation(from: accumulatedText)
+                            continuation.yield(finalText)
+                            continuation.finish()
+                            return
+                        }
+
+                        // Clean partial tokens and yield
+                        let cleanedText = self.removeEndTokenPrefix(from: accumulatedText)
+                        continuation.yield(cleanedText.trimmingCharacters(in: .whitespacesAndNewlines))
+
+                    case .info:
+                        // Generation complete without explicit end token
+                        let finalText = self.extractTranslation(from: accumulatedText)
+                        continuation.yield(finalText)
+                        continuation.finish()
+                        return
+
+                    case .toolCall:
+                        // Not expected for translation, ignore
+                        break
+                    }
+                }
+
+                // Stream ended naturally
+                let finalText = self?.extractTranslation(from: accumulatedText) ?? accumulatedText
+                continuation.yield(finalText.trimmingCharacters(in: .whitespacesAndNewlines))
+                continuation.finish()
+            }
+        }
+    }
+    #endif
 }

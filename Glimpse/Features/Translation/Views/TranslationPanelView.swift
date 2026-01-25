@@ -69,6 +69,9 @@ struct TranslationPanelView: View {
     /// Only used when Apple Translation backend is selected.
     @State private var translationConfiguration: TranslationSession.Configuration?
 
+    /// Task for streaming LocalLLM translation (for cancellation support).
+    @State private var streamingTask: Task<Void, Never>?
+
     @AppStorage(LanguageSettingsKey.languageOne)
     private var languageOne: SupportedLanguage = .english
 
@@ -163,6 +166,9 @@ struct TranslationPanelView: View {
     /// Handles panel open event, optionally with captured text.
     private func handlePanelOpen(text: String?) {
         Self.logger.info("Panel opened, captured text: \(text != nil ? "yes" : "no")")
+        // Cancel any existing streaming task
+        streamingTask?.cancel()
+        streamingTask = nil
         state.reset()
         translationConfiguration = nil
         if let text {
@@ -268,31 +274,61 @@ struct TranslationPanelView: View {
         }
     }
 
-    /// Triggers Local LLM translation via TranslationCoordinator.
+    /// Triggers Local LLM translation with streaming output.
     private func triggerLocalLLMTranslation(to targetLanguage: SupportedLanguage) {
-        let sourceLanguage = state.isAutoDetect ? nil : languageOne
+        // Cancel any existing streaming task
+        streamingTask?.cancel()
 
-        Task {
+        let sourceLanguage = state.isAutoDetect ? nil : languageOne
+        let inputText = state.inputText
+
+        streamingTask = Task {
+            #if canImport(MLXLLM)
             do {
-                let result = try await LocalLLMTranslationBackend.shared.translate(
-                    text: state.inputText,
+                let result = try await LocalLLMTranslationBackend.shared.translateStreaming(
+                    text: inputText,
                     from: sourceLanguage,
                     to: targetLanguage
                 )
 
-                state.translatedText = result.translatedText
-                state.translationError = nil
-
+                // Update detected language immediately
                 if let detected = result.detectedSourceLanguage {
                     state.detectedSourceLanguage = detected
                 }
-            } catch {
-                state.translationError = error.localizedDescription
+
+                // Clear and stream incrementally
                 state.translatedText = ""
-                Self.logger.error("Local LLM translation failed: \(error.localizedDescription)")
+                state.translationError = nil
+
+                for await text in result.textStream {
+                    // Check for cancellation
+                    if Task.isCancelled { break }
+
+                    // Update UI with streamed text
+                    state.translatedText = text
+                }
+
+                // Validate final result
+                if state.translatedText.isEmpty || state.translatedText == inputText {
+                    state.translationError = TranslationError.noTranslationFound
+                    state.translatedText = ""
+                }
+            } catch {
+                if !Task.isCancelled {
+                    state.translationError = error.localizedDescription
+                    state.translatedText = ""
+                    Self.logger.error("Local LLM translation failed: \(error.localizedDescription)")
+                }
             }
 
+            if !Task.isCancelled {
+                state.isTranslating = false
+            }
+            #else
+            // Fallback for when MLXLLM is not available
+            state.translationError = "Local LLM not available"
             state.isTranslating = false
+            #endif
         }
     }
 
