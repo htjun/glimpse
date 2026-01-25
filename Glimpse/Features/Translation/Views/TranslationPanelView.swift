@@ -100,7 +100,7 @@ struct TranslationPanelView: View {
                 onCopy: copyTranslation
             )
         }
-        .frame(height: GlimpseTheme.Sizing.contentHeight)
+        .frame(minHeight: GlimpseTheme.Sizing.contentHeight)
         .containerStyle()
         .overlay { keyboardHandlers }
         .onAppear {

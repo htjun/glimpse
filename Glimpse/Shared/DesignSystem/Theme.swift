@@ -125,5 +125,8 @@ enum GlimpseTheme {
 
         /// Outer padding around container
         static let outerPadding: CGFloat = 4
+
+        /// Maximum height for scrollable text areas
+        static let maxTextAreaHeight: CGFloat = 800
     }
 }

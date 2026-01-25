@@ -32,23 +32,24 @@ struct TargetColumnView: View {
             .padding(.leading, GlimpseTheme.Spacing.lg)
             .padding(.top, GlimpseTheme.Spacing.lg)
 
-            // Translation output area
-            ZStack(alignment: .topLeading) {
-                if isTranslating {
-                    loadingView
-                } else if let error {
-                    errorView(error)
-                } else if translatedText.isEmpty {
-                    placeholderView
-                } else {
-                    resultView
+            // Translation output area (scrollable)
+            ScrollView(.vertical, showsIndicators: true) {
+                ZStack(alignment: .topLeading) {
+                    if isTranslating {
+                        loadingView
+                    } else if let error {
+                        errorView(error)
+                    } else if translatedText.isEmpty {
+                        placeholderView
+                    } else {
+                        resultView
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                .padding(.top, GlimpseTheme.Spacing.md)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, GlimpseTheme.Spacing.lg)
-            .padding(.top, GlimpseTheme.Spacing.md)
-
-            Spacer()
+            .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
 
             // Copy button (bottom-right)
             if hasTranslation {

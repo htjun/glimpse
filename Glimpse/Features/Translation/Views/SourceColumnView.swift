@@ -34,31 +34,32 @@ struct SourceColumnView: View {
             .padding(.leading, GlimpseTheme.Spacing.lg)
             .padding(.top, GlimpseTheme.Spacing.lg)
 
-            // Text input area
-            ZStack(alignment: .topLeading) {
-                // Placeholder
-                if inputText.isEmpty {
-                    Text("Enter text...")
+            // Text input area (scrollable)
+            ScrollView(.vertical, showsIndicators: true) {
+                ZStack(alignment: .topLeading) {
+                    // Placeholder
+                    if inputText.isEmpty {
+                        Text("Enter text...")
+                            .font(GlimpseTheme.Typography.body)
+                            .foregroundStyle(GlimpseTheme.Colors.placeholderText)
+                            .allowsHitTesting(false)
+                    }
+
+                    // Text editor
+                    TextEditor(text: $inputText)
                         .font(GlimpseTheme.Typography.body)
-                        .foregroundStyle(GlimpseTheme.Colors.placeholderText)
-                        .allowsHitTesting(false)
+                        .foregroundStyle(GlimpseTheme.Colors.textPrimary)
+                        .scrollContentBackground(.hidden)
+                        .scrollDisabled(true)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .focused($isInputFocused)
+                        .accessibilityLabel("Text to translate")
+                        .accessibilityHint("Enter text you want to translate")
                 }
-
-                // Text editor
-                TextEditor(text: $inputText)
-                    .font(GlimpseTheme.Typography.body)
-                    .foregroundStyle(GlimpseTheme.Colors.textPrimary)
-                    .scrollContentBackground(.hidden)
-                    .scrollDisabled(true)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .focused($isInputFocused)
-                    .accessibilityLabel("Text to translate")
-                    .accessibilityHint("Enter text you want to translate")
+                .padding(.horizontal, GlimpseTheme.Spacing.lg)
+                .padding(.top, GlimpseTheme.Spacing.md)
             }
-            .padding(.horizontal, GlimpseTheme.Spacing.lg)
-            .padding(.top, GlimpseTheme.Spacing.md)
-
-            Spacer()
+            .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
 
             // Settings button (bottom-left)
             Button(action: onOpenSettings) {}
