@@ -160,7 +160,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E9EBFA182F10730900D6CA79 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				E94D407D2F24A9CE00CC8907 /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
+				E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "LocalPackages/mlx-swift-lm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E9EBF9EE2F10730700D6CA79 /* Products */;
@@ -463,9 +463,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "mlx-swift-lm" */ = {
+		E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "LocalPackages/mlx-swift-lm" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = LocalPackages/mlx-swift-lm;
+			relativePath = "LocalPackages/mlx-swift-lm";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -483,12 +483,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		E94D407E2F24A9CE00CC8907 /* MLXLLM */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "mlx-swift-lm" */;
+			package = E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "LocalPackages/mlx-swift-lm" */;
 			productName = MLXLLM;
 		};
 		E94D40802F24A9CE00CC8907 /* MLXLMCommon */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "mlx-swift-lm" */;
+			package = E94D407D2F24A9CE00CC8907 /* XCLocalSwiftPackageReference "LocalPackages/mlx-swift-lm" */;
 			productName = MLXLMCommon;
 		};
 		E9EBFA192F10730900D6CA79 /* KeyboardShortcuts */ = {

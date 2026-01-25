@@ -12,6 +12,7 @@ enum LanguageSelectorMode {
 }
 
 /// Dropdown component for selecting source or target language.
+/// Simplified design with text + chevron only.
 struct LanguageSelectorView: View {
 
     // MARK: - Properties
@@ -70,43 +71,22 @@ struct LanguageSelectorView: View {
     }
 
     private var menuLabel: some View {
-        HStack(spacing: GlimpseTheme.Spacing.sm) {
-            Image(systemName: iconName)
-                .font(.system(size: 14))
-                .foregroundStyle(iconColor)
-
+        HStack(spacing: GlimpseTheme.Spacing.xs) {
             Text(displayText)
-                .font(GlimpseTheme.Typography.caption)
-                .foregroundStyle(.primary)
+                .font(GlimpseTheme.Typography.uiLabel)
+                .foregroundStyle(GlimpseTheme.Colors.textSecondary)
 
             Image(systemName: "chevron.down")
                 .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.black.opacity(0.3))
         }
-        .padding(.horizontal, GlimpseTheme.Spacing.md)
-        .padding(.vertical, GlimpseTheme.Spacing.sm)
         .contentShape(Rectangle())
     }
 
     // MARK: - Computed Properties
 
-    private var isSourceMode: Bool {
-        mode == .source
-    }
-
-    private var iconName: String {
-        if mode == .target {
-            return "text.bubble.fill"
-        }
-        return isAutoDetect ? "sparkles" : "text.bubble"
-    }
-
-    private var iconColor: Color {
-        isSourceMode && isAutoDetect ? .blue : .primary
-    }
-
     private var displayText: String {
-        if isSourceMode && isAutoDetect {
+        if mode == .source && isAutoDetect {
             if let detected = detectedLanguage {
                 return "\(detected.displayName) - Detected"
             }
@@ -116,7 +96,7 @@ struct LanguageSelectorView: View {
     }
 
     private var accessibilityLabel: String {
-        let prefix = isSourceMode ? "Source" : "Target"
+        let prefix = mode == .source ? "Source" : "Target"
         return "\(prefix) language: \(displayText)"
     }
 }
@@ -145,4 +125,5 @@ struct LanguageSelectorView: View {
         )
     }
     .padding()
+    .background(GlimpseTheme.Colors.containerBackground)
 }

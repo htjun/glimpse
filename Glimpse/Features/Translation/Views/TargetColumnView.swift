@@ -6,6 +6,7 @@
 import SwiftUI
 
 /// Right column with translation output.
+/// Contains embedded language selector and copy button. Transparent background.
 struct TargetColumnView: View {
 
     // MARK: - Properties
@@ -13,16 +14,26 @@ struct TargetColumnView: View {
     let translatedText: String
     let isTranslating: Bool
     let error: String?
+    @Binding var targetLanguage: SupportedLanguage
+    let hasTranslation: Bool
+    let onCopy: () -> Void
 
     // MARK: - Body
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            // Background
-            GlimpseTheme.Colors.targetColumnBackground
+        VStack(alignment: .leading, spacing: 0) {
+            // Language selector (top-left)
+            LanguageSelectorView(
+                mode: .target,
+                selectedLanguage: $targetLanguage,
+                detectedLanguage: nil,
+                isAutoDetect: .constant(false)
+            )
+            .padding(.leading, GlimpseTheme.Spacing.lg)
+            .padding(.top, GlimpseTheme.Spacing.lg)
 
-            // Content
-            VStack(alignment: .leading, spacing: GlimpseTheme.Spacing.md) {
+            // Translation output area
+            ZStack(alignment: .topLeading) {
                 if isTranslating {
                     loadingView
                 } else if let error {
@@ -34,17 +45,27 @@ struct TargetColumnView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(GlimpseTheme.Spacing.lg)
+            .padding(.horizontal, GlimpseTheme.Spacing.lg)
+            .padding(.top, GlimpseTheme.Spacing.md)
+
+            Spacer()
+
+            // Copy button (bottom-right)
+            if hasTranslation {
+                HStack {
+                    Spacer()
+                    Button(action: onCopy) {}
+                        .buttonStyle(CopyButtonStyle())
+                        .accessibilityLabel("Copy translation")
+                        .accessibilityHint("Press Command+Return to copy the translation to clipboard")
+                }
+                .padding(.trailing, GlimpseTheme.Spacing.sm)
+                .padding(.bottom, GlimpseTheme.Spacing.sm)
+            }
         }
-        .frame(minWidth: GlimpseTheme.Sizing.columnMinWidth, minHeight: GlimpseTheme.Sizing.textAreaMinHeight)
-        .clipShape(
-            UnevenRoundedRectangle(
-                topLeadingRadius: 0,
-                bottomLeadingRadius: 0,
-                bottomTrailingRadius: GlimpseTheme.Radii.standard,
-                topTrailingRadius: 0
-            )
-        )
+        .frame(width: GlimpseTheme.Sizing.columnWidth)
+        .frame(maxHeight: .infinity)
+        // No background - transparent
     }
 
     // MARK: - View Components
@@ -68,6 +89,7 @@ struct TargetColumnView: View {
     private var resultView: some View {
         Text(translatedText)
             .font(GlimpseTheme.Typography.body)
+            .foregroundStyle(GlimpseTheme.Colors.textPrimary)
             .textSelection(.enabled)
             .fixedSize(horizontal: false, vertical: true)
     }
@@ -78,7 +100,7 @@ struct TargetColumnView: View {
                 .foregroundStyle(GlimpseTheme.Colors.errorIcon)
                 .accessibilityHidden(true)
             Text(message)
-                .font(GlimpseTheme.Typography.caption)
+                .font(GlimpseTheme.Typography.uiLabel)
                 .foregroundStyle(.secondary)
         }
         .padding(GlimpseTheme.Spacing.md)
@@ -90,30 +112,35 @@ struct TargetColumnView: View {
 }
 
 #Preview {
-    HStack(spacing: 0) {
+    HStack(spacing: GlimpseTheme.Spacing.xs) {
         TargetColumnView(
             translatedText: "",
             isTranslating: false,
-            error: nil
+            error: nil,
+            targetLanguage: .constant(.korean),
+            hasTranslation: false,
+            onCopy: {}
         )
 
         TargetColumnView(
             translatedText: "",
             isTranslating: true,
-            error: nil
+            error: nil,
+            targetLanguage: .constant(.korean),
+            hasTranslation: false,
+            onCopy: {}
         )
 
         TargetColumnView(
-            translatedText: "Bonjour, comment allez-vous aujourd'hui?",
+            translatedText: "안녕하세요, 오늘 어떻게 지내세요?",
             isTranslating: false,
-            error: nil
-        )
-
-        TargetColumnView(
-            translatedText: "",
-            isTranslating: false,
-            error: "Translation failed"
+            error: nil,
+            targetLanguage: .constant(.korean),
+            hasTranslation: true,
+            onCopy: {}
         )
     }
-    .frame(height: 300)
+    .frame(height: GlimpseTheme.Sizing.contentHeight)
+    .padding(GlimpseTheme.Spacing.xs)
+    .background(GlimpseTheme.Colors.containerBackground)
 }

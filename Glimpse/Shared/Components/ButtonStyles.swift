@@ -5,63 +5,79 @@
 
 import SwiftUI
 
-/// Primary button style - configurable for normal and loading states.
-struct PrimaryButtonStyle: ButtonStyle {
-    @Environment(\.isEnabled) private var isEnabled
-
-    var isLoading: Bool = false
-
+/// Settings button style (bottom-left of source column).
+struct SettingsButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .textCase(.uppercase)
-            .font(GlimpseTheme.Typography.buttonPrimary)
-            .tracking(0.5)
-            .foregroundColor(foregroundColor)
-            .padding(.horizontal, GlimpseTheme.Spacing.lg)
-            .frame(height: GlimpseTheme.Sizing.primaryButtonHeight)
-            .frame(minWidth: GlimpseTheme.Sizing.primaryButtonMinWidth)
-            .background(
-                Capsule()
-                    .fill(backgroundColor(isPressed: configuration.isPressed))
-            )
-            .overlay(
-                Capsule()
-                    .strokeBorder(borderColor, lineWidth: 1)
-            )
-    }
-
-    private var foregroundColor: Color {
-        isLoading ? GlimpseTheme.Colors.textDisabled : .white
-    }
-
-    private var borderColor: Color {
-        isLoading ? GlimpseTheme.Colors.buttonBorder : .clear
-    }
-
-    private func backgroundColor(isPressed: Bool) -> Color {
-        if isLoading { return GlimpseTheme.Colors.panelBackground }
-        if !isEnabled { return GlimpseTheme.Colors.buttonDisabled }
-        return isPressed ? Color.black.opacity(0.7) : .black
+        HStack(spacing: GlimpseTheme.Spacing.xs) {
+            Image(systemName: "gearshape")
+                .font(.system(size: 14))
+                .foregroundStyle(GlimpseTheme.Colors.textSecondary)
+            Text("Settings")
+                .font(GlimpseTheme.Typography.button)
+                .foregroundStyle(GlimpseTheme.Colors.textTertiary)
+        }
+        .padding(.horizontal, GlimpseTheme.Spacing.sm)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                .fill(configuration.isPressed ? Color.black.opacity(0.05) : Color.clear)
+        )
+        .contentShape(Rectangle())
     }
 }
 
-/// Secondary button style - small outlined for action buttons (Copy/Replace).
-struct SecondaryButtonStyle: ButtonStyle {
+/// Copy button style with keyboard shortcut icons.
+struct CopyButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .textCase(.uppercase)
-            .font(GlimpseTheme.Typography.buttonSecondary)
-            .tracking(0.3)
-            .foregroundColor(configuration.isPressed ? .secondary : .primary)
-            .padding(.horizontal, GlimpseTheme.Spacing.md)
-            .padding(.vertical, GlimpseTheme.Spacing.sm)
-            .background(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.small)
-                    .fill(configuration.isPressed ? GlimpseTheme.Colors.buttonPressedBackground : Color.clear)
-            )
+        HStack(spacing: GlimpseTheme.Spacing.sm) {
+            Text("Copy Translation")
+                .font(GlimpseTheme.Typography.button)
+                .foregroundStyle(GlimpseTheme.Colors.textTertiary)
+
+            HStack(spacing: GlimpseTheme.Spacing.xs) {
+                KeyIcon(systemName: "command")
+                KeyIcon(systemName: "return")
+            }
+        }
+        .padding(.horizontal, GlimpseTheme.Spacing.md)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                .fill(GlimpseTheme.Colors.buttonBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: GlimpseTheme.Radii.standard)
+                        .strokeBorder(GlimpseTheme.Colors.cardBorder, lineWidth: 1)
+                )
+        )
+        .opacity(configuration.isPressed ? 0.8 : 1.0)
+        .contentShape(Rectangle())
+    }
+}
+
+/// Small keyboard key icon used in button hints.
+private struct KeyIcon: View {
+    let systemName: String
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 4)
+            .fill(GlimpseTheme.Colors.iconBackground)
+            .frame(width: 16, height: 16)
             .overlay(
-                RoundedRectangle(cornerRadius: GlimpseTheme.Radii.small)
-                    .stroke(GlimpseTheme.Colors.buttonBorder, lineWidth: 1)
+                Image(systemName: systemName)
+                    .font(.system(size: 10))
+                    .foregroundStyle(GlimpseTheme.Colors.textSecondary)
             )
     }
+}
+
+#Preview("Button Styles") {
+    VStack(spacing: 20) {
+        Button(action: {}) {}
+            .buttonStyle(SettingsButtonStyle())
+
+        Button(action: {}) {}
+            .buttonStyle(CopyButtonStyle())
+    }
+    .padding()
+    .background(GlimpseTheme.Colors.containerBackground)
 }

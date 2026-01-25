@@ -11,20 +11,39 @@ enum GlimpseTheme {
     // MARK: - Colors
 
     enum Colors {
-        /// Panel background - warm off-white
-        static let panelBackground = Color(red: 247 / 255, green: 247 / 255, blue: 244 / 255)
+        // MARK: New Panel Design Colors
 
-        /// Panel border
-        static let panelBorder = Color(red: 222 / 255, green: 221 / 255, blue: 217 / 255)
+        /// Container background - warm light gray (#F4F2F0)
+        static let containerBackground = Color(red: 244 / 255, green: 242 / 255, blue: 240 / 255)
 
-        /// Button border for secondary buttons
-        static let buttonBorder = Color.gray.opacity(0.3)
+        /// Card background - warm off-white (#FDFCF9)
+        static let cardBackground = Color(red: 253 / 255, green: 252 / 255, blue: 249 / 255)
 
-        /// Disabled button background
-        static let buttonDisabled = Color(red: 203 / 255, green: 203 / 255, blue: 203 / 255)
+        /// Card border color (#D9D9D1)
+        static let cardBorder = Color(red: 217 / 255, green: 217 / 255, blue: 209 / 255)
 
-        /// Secondary button pressed background
-        static let buttonPressedBackground = Color.gray.opacity(0.1)
+        /// Container border
+        static let containerBorder = Color.black.opacity(0.1)
+
+        /// Primary text color - dark brown-black (#26251E)
+        static let textPrimary = Color(red: 38 / 255, green: 37 / 255, blue: 30 / 255)
+
+        /// Secondary text color
+        static let textSecondary = Color.black.opacity(0.5)
+
+        /// Tertiary text color
+        static let textTertiary = Color.black.opacity(0.6)
+
+        /// Icon background (#EFEEEB)
+        static let iconBackground = Color(red: 239 / 255, green: 238 / 255, blue: 235 / 255)
+
+        /// Button background
+        static let buttonBackground = Color.white.opacity(0.6)
+
+        /// Placeholder text color
+        static let placeholderText = Color.black.opacity(0.3)
+
+        // MARK: Semantic Colors
 
         /// Disabled/loading text
         static let textDisabled = Color.primary.opacity(0.6)
@@ -40,23 +59,6 @@ enum GlimpseTheme {
 
         /// Info background tint
         static let infoBackground = Color.secondary.opacity(0.1)
-
-        // MARK: Two-Column Layout Colors
-
-        /// Source column background - light blue tint
-        static let sourceColumnBackground = Color(red: 240 / 255, green: 244 / 255, blue: 252 / 255)
-
-        /// Target column background - warm cream
-        static let targetColumnBackground = Color(red: 250 / 255, green: 249 / 255, blue: 246 / 255)
-
-        /// Swap button background
-        static let swapButtonBackground = Color(white: 0.95)
-
-        /// Placeholder text color
-        static let placeholderText = Color.gray.opacity(0.4)
-
-        /// Header/footer background
-        static let headerBackground = Color(white: 0.97)
     }
 
     // MARK: - Spacing
@@ -74,6 +76,7 @@ enum GlimpseTheme {
     enum Radii {
         static let small: CGFloat = 6
         static let standard: CGFloat = 8
+        static let container: CGFloat = 12
     }
 
     // MARK: - Typography
@@ -81,48 +84,46 @@ enum GlimpseTheme {
     enum Typography {
         private static let fontFamily = "Geist"
 
-        /// Body text with system font fallback
-        static let body = Font.custom("\(fontFamily)-Regular", size: 16, relativeTo: .body)
+        /// Body text - 18px for main content
+        static let body = Font.custom("\(fontFamily)-Regular", size: 18, relativeTo: .body)
 
-        /// Caption text with system font fallback
+        /// UI label text - 14px medium for selectors
+        static let uiLabel = Font.custom("\(fontFamily)-Medium", size: 14, relativeTo: .callout)
+
+        /// Caption text - 14px for secondary content
         static let caption = Font.custom("\(fontFamily)-Regular", size: 14, relativeTo: .callout)
 
-        /// Footnote text with system font fallback
+        /// Footnote text - 12px medium
         static let footnote = Font.custom("\(fontFamily)-Medium", size: 12, relativeTo: .footnote)
 
-        /// Primary button text with system font fallback
-        static let buttonPrimary = Font.custom("\(fontFamily)-SemiBold", size: 13, relativeTo: .subheadline)
-
-        /// Secondary button text with system font fallback
-        static let buttonSecondary = Font.custom("\(fontFamily)-Medium", size: 11, relativeTo: .caption)
+        /// Button text - 13px medium
+        static let button = Font.custom("\(fontFamily)-Medium", size: 13, relativeTo: .subheadline)
     }
 
     // MARK: - Sizing
 
     enum Sizing {
-        static let panelWidth: CGFloat = 480
-        static let panelMaxHeight: CGFloat = 800
-        static let primaryButtonHeight: CGFloat = 32
-        static let primaryButtonMinWidth: CGFloat = 100
+        // MARK: New Panel Design Sizing
 
-        // MARK: Two-Column Layout Sizing
+        /// Outer container width (includes padding)
+        static let containerWidth: CGFloat = 747
 
-        /// Width for the two-column panel
-        static let twoColumnPanelWidth: CGFloat = 720
+        /// Content width inside container
+        static let contentWidth: CGFloat = 731
 
-        /// Minimum width for each column
-        static let columnMinWidth: CGFloat = 320
+        /// Content height
+        static let contentHeight: CGFloat = 400
 
-        /// Header height
-        static let headerHeight: CGFloat = 48
+        /// Width for each column
+        static let columnWidth: CGFloat = 365
 
-        /// Footer height
-        static let footerHeight: CGFloat = 44
+        /// Inner padding between container edge and content
+        static let innerPadding: CGFloat = 4
 
-        /// Swap button size
-        static let swapButtonSize: CGFloat = 36
+        /// Padding inside the card
+        static let cardPadding: CGFloat = 16
 
-        /// Minimum height for text areas
-        static let textAreaMinHeight: CGFloat = 280
+        /// Outer padding around container
+        static let outerPadding: CGFloat = 4
     }
 }

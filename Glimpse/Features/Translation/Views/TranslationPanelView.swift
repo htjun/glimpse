@@ -81,46 +81,27 @@ struct TranslationPanelView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with language selectors and swap button
-            TranslationHeaderView(
+        HStack(spacing: 0) {
+            SourceColumnView(
+                inputText: $state.inputText,
                 sourceLanguage: $languageOne,
-                targetLanguage: $languageTwo,
                 detectedLanguage: state.detectedSourceLanguage,
                 isAutoDetect: $state.isAutoDetect,
-                onSwap: swapLanguages
+                onSubmit: performLookup,
+                onOpenSettings: openSettings
             )
 
-            Divider()
-
-            // Two-column content area with unified scroll
-            ScrollView {
-                HStack(spacing: 0) {
-                    SourceColumnView(
-                        inputText: $state.inputText,
-                        onSubmit: performLookup
-                    )
-
-                    Divider()
-
-                    TargetColumnView(
-                        translatedText: state.translatedText,
-                        isTranslating: state.isTranslating,
-                        error: state.translationError
-                    )
-                }
-            }
-            .scrollBounceBehavior(.basedOnSize)
-
-            Divider()
-
-            // Footer with app branding and copy button
-            TranslationFooterView(
+            TargetColumnView(
+                translatedText: state.translatedText,
+                isTranslating: state.isTranslating,
+                error: state.translationError,
+                targetLanguage: $languageTwo,
                 hasTranslation: hasResult,
                 onCopy: copyTranslation
             )
         }
-        .twoColumnPanelStyle()
+        .frame(height: GlimpseTheme.Sizing.contentHeight)
+        .containerStyle()
         .overlay { keyboardHandlers }
         .onAppear {
             handlePanelOpen(text: initialText)
@@ -190,26 +171,10 @@ struct TranslationPanelView: View {
         }
     }
 
-    /// Swaps source and target languages.
-    private func swapLanguages() {
-        // Get the effective source language (detected or explicit)
-        let effectiveSource = state.isAutoDetect
-            ? (state.detectedSourceLanguage ?? languageOne)
-            : languageOne
-
-        // Swap
-        languageOne = languageTwo
-        languageTwo = effectiveSource
-
-        // After swap, turn off auto-detect since user explicitly chose
-        state.isAutoDetect = false
-
-        // Re-translate if we have text
-        if !state.inputText.isEmpty {
-            triggerTranslation()
-        }
-
-        Self.logger.info("Swapped languages: \(languageOne.displayName) -> \(languageTwo.displayName)")
+    /// Opens the Settings window.
+    private func openSettings() {
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        Self.logger.info("Settings opened from translation panel")
     }
 
     /// Performs lookup by trying bilingual dictionary first for single words, then falling back to translation.
@@ -237,13 +202,10 @@ struct TranslationPanelView: View {
     /// Returns the definition if found, or nil to fall back to translation.
     private func lookupBilingualDefinition(for word: String) -> String? {
         // Bilingual dictionaries are always paired with English
-        let nonEnglishLanguage: SupportedLanguage?
-        if languageOne == .english {
-            nonEnglishLanguage = languageTwo
-        } else if languageTwo == .english {
-            nonEnglishLanguage = languageOne
-        } else {
-            nonEnglishLanguage = nil
+        let nonEnglishLanguage: SupportedLanguage? = switch (languageOne, languageTwo) {
+        case (.english, let other): other
+        case (let other, .english): other
+        default: nil
         }
 
         guard let targetLang = nonEnglishLanguage,
@@ -372,22 +334,22 @@ struct TranslationPanelView: View {
 // MARK: - View Modifiers
 
 extension View {
-    /// Applies the two-column translation panel styling.
-    func twoColumnPanelStyle() -> some View {
-        let cornerRadius = GlimpseTheme.Radii.standard
+    /// Applies the new container styling for the translation panel.
+    func containerStyle() -> some View {
+        let cornerRadius = GlimpseTheme.Radii.container
         return self
-            .frame(width: GlimpseTheme.Sizing.twoColumnPanelWidth, alignment: .top)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .padding(GlimpseTheme.Sizing.innerPadding)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(GlimpseTheme.Colors.panelBackground)
-                    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+                    .fill(GlimpseTheme.Colors.containerBackground)
+                    .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: 12)
+                    .shadow(color: .black.opacity(0.08), radius: 32, x: 0, y: 12)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(GlimpseTheme.Colors.panelBorder, lineWidth: 1)
+                    .strokeBorder(GlimpseTheme.Colors.containerBorder, lineWidth: 1)
             )
-            .padding(GlimpseTheme.Spacing.xl)
+            .padding(GlimpseTheme.Sizing.outerPadding)
     }
 }
 
