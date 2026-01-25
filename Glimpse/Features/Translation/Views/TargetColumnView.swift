@@ -33,7 +33,7 @@ struct TargetColumnView: View {
             .padding(.top, GlimpseTheme.Spacing.lg)
 
             // Translation output area (scrollable)
-            ScrollView(.vertical, showsIndicators: true) {
+            ScrollView(.vertical, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
                     if isTranslating {
                         loadingView
@@ -50,6 +50,7 @@ struct TargetColumnView: View {
                 .padding(.top, GlimpseTheme.Spacing.md)
             }
             .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
+            .fadingScrollbar()
 
             // Copy button (bottom-right)
             if hasTranslation {

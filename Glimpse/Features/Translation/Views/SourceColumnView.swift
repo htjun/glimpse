@@ -35,7 +35,7 @@ struct SourceColumnView: View {
             .padding(.top, GlimpseTheme.Spacing.lg)
 
             // Text input area (scrollable)
-            ScrollView(.vertical, showsIndicators: true) {
+            ScrollView(.vertical, showsIndicators: false) {
                 ZStack(alignment: .topLeading) {
                     // Placeholder
                     if inputText.isEmpty {
@@ -60,6 +60,7 @@ struct SourceColumnView: View {
                 .padding(.top, GlimpseTheme.Spacing.md)
             }
             .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
+            .fadingScrollbar()
 
             // Settings button (bottom-left)
             Button(action: onOpenSettings) {}

@@ -129,4 +129,17 @@ enum GlimpseTheme {
         /// Maximum height for scrollable text areas
         static let maxTextAreaHeight: CGFloat = 800
     }
+
+    // MARK: - Scrollbar
+
+    enum Scrollbar {
+        static let width: CGFloat = 6
+        static let cornerRadius: CGFloat = 3
+        static let minThumbHeight: CGFloat = 30
+        static let edgePadding: CGFloat = 4
+        static let fadeDelay: TimeInterval = 1.5
+        static let fadeInDuration: TimeInterval = 0.15
+        static let fadeOutDuration: TimeInterval = 0.3
+        static let thumbColor = Color.black.opacity(0.25)
+    }
 }
