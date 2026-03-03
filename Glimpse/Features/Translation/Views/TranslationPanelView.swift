@@ -90,8 +90,7 @@ struct TranslationPanelView: View {
                 sourceLanguage: $languageOne,
                 detectedLanguage: state.detectedSourceLanguage,
                 isAutoDetect: $state.isAutoDetect,
-                onSubmit: performLookup,
-                onOpenSettings: openSettings
+                onSubmit: performLookup
             )
 
             TargetColumnView(
@@ -175,12 +174,6 @@ struct TranslationPanelView: View {
             state.inputText = text.trimmingCharacters(in: .whitespacesAndNewlines)
             performLookup()
         }
-    }
-
-    /// Opens the Settings window.
-    private func openSettings() {
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        Self.logger.info("Settings opened from translation panel")
     }
 
     /// Performs lookup by trying bilingual dictionary first for single words, then falling back to translation.

@@ -16,7 +16,6 @@ struct SourceColumnView: View {
     let detectedLanguage: SupportedLanguage?
     @Binding var isAutoDetect: Bool
     let onSubmit: () -> Void
-    let onOpenSettings: () -> Void
 
     @FocusState private var isInputFocused: Bool
 
@@ -60,7 +59,9 @@ struct SourceColumnView: View {
             .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
             .fadingScrollbar()
 
-            Button(action: onOpenSettings) {}
+            SettingsLink {
+                EmptyView()
+            }
                 .buttonStyle(SettingsButtonStyle())
                 .padding(.leading, GlimpseTheme.Spacing.sm)
                 .padding(.bottom, GlimpseTheme.Spacing.sm)
@@ -89,8 +90,7 @@ struct SourceColumnView: View {
             sourceLanguage: .constant(.english),
             detectedLanguage: nil,
             isAutoDetect: .constant(true),
-            onSubmit: {},
-            onOpenSettings: {}
+            onSubmit: {}
         )
 
         SourceColumnView(
@@ -98,8 +98,7 @@ struct SourceColumnView: View {
             sourceLanguage: .constant(.english),
             detectedLanguage: .english,
             isAutoDetect: .constant(true),
-            onSubmit: {},
-            onOpenSettings: {}
+            onSubmit: {}
         )
     }
     .frame(height: GlimpseTheme.Sizing.contentHeight)
