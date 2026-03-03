@@ -5,70 +5,77 @@
 
 import SwiftUI
 
-/// A view modifier that adds a Raycast-style minimal fading scrollbar overlay.
-/// Uses `onScrollGeometryChange` (macOS 15+) to track scroll position.
-struct FadingScrollbar: ViewModifier {
+/// Shared scroll metrics model for both SwiftUI and AppKit-backed editors.
+struct EditorScrollMetrics: Equatable {
+    let contentHeight: CGFloat
+    let visibleHeight: CGFloat
+    let contentOffset: CGFloat
 
-    // MARK: - State
+    static let zero = EditorScrollMetrics(contentHeight: 0, visibleHeight: 0, contentOffset: 0)
 
-    @State private var contentHeight: CGFloat = 0
-    @State private var visibleHeight: CGFloat = 0
-    @State private var contentOffset: CGFloat = 0
-    @State private var isVisible: Bool = false
-    @State private var hideTask: Task<Void, Never>?
-
-    // MARK: - Computed Properties
-
-    private var needsScrollbar: Bool {
-        contentHeight > visibleHeight
+    var maxOffset: CGFloat {
+        max(contentHeight - visibleHeight, 0)
     }
 
+    var clampedOffset: CGFloat {
+        min(max(contentOffset, 0), maxOffset)
+    }
+
+    var needsScrollbar: Bool {
+        contentHeight > visibleHeight
+    }
+}
+
+/// Scrollbar renderer that only depends on scroll metrics.
+struct FadingScrollbarOverlay: View {
+    let metrics: EditorScrollMetrics
+
+    @State private var isVisible = false
+    @State private var hideTask: Task<Void, Never>?
+
     private var thumbHeight: CGFloat {
-        guard contentHeight > 0 else { return 0 }
-        let ratio = visibleHeight / contentHeight
-        return max(GlimpseTheme.Scrollbar.minThumbHeight, visibleHeight * ratio)
+        guard metrics.contentHeight > 0 else { return 0 }
+        let ratio = metrics.visibleHeight / metrics.contentHeight
+        return max(GlimpseTheme.Scrollbar.minThumbHeight, metrics.visibleHeight * ratio)
     }
 
     private var thumbOffset: CGFloat {
-        let maxOffset = contentHeight - visibleHeight
-        guard maxOffset > 0 else { return 0 }
-        let trackHeight = visibleHeight - thumbHeight - (GlimpseTheme.Scrollbar.edgePadding * 2)
-        return (contentOffset / maxOffset) * trackHeight
+        guard metrics.maxOffset > 0 else { return 0 }
+        let trackHeight = metrics.visibleHeight - thumbHeight - (GlimpseTheme.Scrollbar.edgePadding * 2)
+        return (metrics.clampedOffset / metrics.maxOffset) * trackHeight
     }
 
-    // MARK: - Body
-
-    func body(content: Content) -> some View {
-        content
-            .onScrollGeometryChange(for: ScrollGeometryData.self) { geometry in
-                ScrollGeometryData(
-                    contentHeight: geometry.contentSize.height,
-                    visibleHeight: geometry.visibleRect.height,
-                    contentOffset: geometry.contentOffset.y
+    var body: some View {
+        Group {
+            if metrics.needsScrollbar {
+                ScrollbarThumb(
+                    height: thumbHeight,
+                    offset: thumbOffset,
+                    isVisible: isVisible
                 )
-            } action: { _, newValue in
-                contentHeight = newValue.contentHeight
-                visibleHeight = newValue.visibleHeight
-                contentOffset = max(0, newValue.contentOffset)
-
-                if needsScrollbar {
-                    showScrollbar()
-                }
             }
-            .overlay(alignment: .trailing) {
-                if needsScrollbar {
-                    ScrollbarThumb(
-                        height: thumbHeight,
-                        offset: thumbOffset,
-                        isVisible: isVisible
-                    )
-                    .padding(.trailing, GlimpseTheme.Scrollbar.edgePadding)
-                    .padding(.vertical, GlimpseTheme.Scrollbar.edgePadding)
-                }
-            }
+        }
+        .onChange(of: metrics) { _, newValue in
+            handleMetricsChange(newValue)
+        }
+        .onDisappear {
+            hideTask?.cancel()
+            hideTask = nil
+        }
     }
 
-    // MARK: - Private Methods
+    private func handleMetricsChange(_ newValue: EditorScrollMetrics) {
+        guard newValue.needsScrollbar else {
+            hideTask?.cancel()
+            hideTask = nil
+            withAnimation(.easeInOut(duration: GlimpseTheme.Scrollbar.fadeOutDuration)) {
+                isVisible = false
+            }
+            return
+        }
+
+        showScrollbar()
+    }
 
     private func showScrollbar() {
         hideTask?.cancel()
@@ -89,12 +96,27 @@ struct FadingScrollbar: ViewModifier {
     }
 }
 
-// MARK: - Supporting Types
+/// A view modifier that tracks SwiftUI ScrollView geometry and uses shared scrollbar rendering.
+struct FadingScrollbar: ViewModifier {
+    @State private var metrics = EditorScrollMetrics.zero
 
-private struct ScrollGeometryData: Equatable {
-    let contentHeight: CGFloat
-    let visibleHeight: CGFloat
-    let contentOffset: CGFloat
+    func body(content: Content) -> some View {
+        content
+            .onScrollGeometryChange(for: EditorScrollMetrics.self) { geometry in
+                EditorScrollMetrics(
+                    contentHeight: geometry.contentSize.height,
+                    visibleHeight: geometry.visibleRect.height,
+                    contentOffset: geometry.contentOffset.y
+                )
+            } action: { _, newValue in
+                metrics = newValue
+            }
+            .overlay(alignment: .trailing) {
+                FadingScrollbarOverlay(metrics: metrics)
+                    .padding(.trailing, GlimpseTheme.Scrollbar.edgePadding)
+                    .padding(.vertical, GlimpseTheme.Scrollbar.edgePadding)
+            }
+    }
 }
 
 private struct ScrollbarThumb: View {

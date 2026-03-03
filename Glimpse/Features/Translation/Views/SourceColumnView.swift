@@ -17,7 +17,7 @@ struct SourceColumnView: View {
     @Binding var isAutoDetect: Bool
     let onSubmit: () -> Void
 
-    @FocusState private var isInputFocused: Bool
+    @State private var scrollMetrics = EditorScrollMetrics.zero
 
     // MARK: - Body
 
@@ -32,39 +32,30 @@ struct SourceColumnView: View {
             .padding(.leading, GlimpseTheme.Spacing.lg)
             .padding(.top, GlimpseTheme.Spacing.lg)
 
-            ScrollView(.vertical, showsIndicators: false) {
-                ZStack(alignment: .topLeading) {
-                    if inputText.isEmpty {
-                        Text("Enter text...")
-                            .font(GlimpseTheme.Typography.body)
-                            .foregroundStyle(GlimpseTheme.Colors.placeholderText)
-                            .padding(.leading, 5)  // Match TextEditor's internal padding
-                            .padding(.top, 8)      // Match TextEditor's internal padding
-                            .allowsHitTesting(false)
-                    }
-
-                    TextEditor(text: $inputText)
-                        .font(GlimpseTheme.Typography.body)
-                        .foregroundStyle(GlimpseTheme.Colors.textPrimary)
-                        .scrollContentBackground(.hidden)
-                        .scrollDisabled(true)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .focused($isInputFocused)
-                        .accessibilityLabel("Text to translate")
-                        .accessibilityHint("Enter text you want to translate")
-                }
-                .padding(.horizontal, GlimpseTheme.Spacing.lg)
-                .padding(.top, GlimpseTheme.Spacing.md)
+            SourceTextEditor(
+                text: $inputText,
+                scrollMetrics: $scrollMetrics,
+                placeholder: "Enter text...",
+                autoFocus: true
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .overlay(alignment: .trailing) {
+                FadingScrollbarOverlay(metrics: scrollMetrics)
+                    .padding(.trailing, GlimpseTheme.Scrollbar.edgePadding)
+                    .padding(.vertical, GlimpseTheme.Scrollbar.edgePadding)
             }
+            .padding(.horizontal, GlimpseTheme.Spacing.lg)
+            .padding(.top, GlimpseTheme.Spacing.md)
             .frame(maxHeight: GlimpseTheme.Sizing.maxTextAreaHeight)
-            .fadingScrollbar()
+            .accessibilityLabel("Text to translate")
+            .accessibilityHint("Enter text you want to translate")
 
             SettingsLink {
                 EmptyView()
             }
-                .buttonStyle(SettingsButtonStyle())
-                .padding(.leading, GlimpseTheme.Spacing.sm)
-                .padding(.bottom, GlimpseTheme.Spacing.sm)
+            .buttonStyle(SettingsButtonStyle())
+            .padding(.leading, GlimpseTheme.Spacing.sm)
+            .padding(.bottom, GlimpseTheme.Spacing.sm)
         }
         .frame(width: GlimpseTheme.Sizing.columnWidth)
         .frame(maxHeight: .infinity)
@@ -76,9 +67,6 @@ struct SourceColumnView: View {
                         .strokeBorder(GlimpseTheme.Colors.cardBorder, lineWidth: 1)
                 )
         )
-        .onAppear {
-            isInputFocused = true
-        }
         .onSubmit(onSubmit)
     }
 }

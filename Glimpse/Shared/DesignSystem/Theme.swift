@@ -83,9 +83,10 @@ enum GlimpseTheme {
 
     enum Typography {
         private static let fontFamily = "Geist"
+        private static let bodySize: CGFloat = 18
 
         /// Body text - 18px for main content
-        static let body = Font.custom("\(fontFamily)-Regular", size: 18, relativeTo: .body)
+        static let body = Font.custom("\(fontFamily)-Regular", size: bodySize, relativeTo: .body)
 
         /// UI label text - 14px medium for selectors
         static let uiLabel = Font.custom("\(fontFamily)-Medium", size: 14, relativeTo: .callout)
@@ -98,6 +99,9 @@ enum GlimpseTheme {
 
         /// Button text - 13px medium
         static let button = Font.custom("\(fontFamily)-Medium", size: 13, relativeTo: .subheadline)
+
+        /// AppKit point size for source editor text.
+        static let bodyPointSize: CGFloat = bodySize
     }
 
     // MARK: - Sizing
@@ -128,6 +132,19 @@ enum GlimpseTheme {
 
         /// Maximum height for scrollable text areas
         static let maxTextAreaHeight: CGFloat = 800
+    }
+
+    // MARK: - Editor
+
+    enum Editor {
+        /// Padding inside the native text container. This controls the first-line Y origin.
+        static let textContainerInsetVertical: CGFloat = 8
+
+        /// Horizontal text container inset (left and right).
+        static let textContainerInsetHorizontal: CGFloat = 0
+
+        /// Native line fragment padding inside the text container.
+        static let lineFragmentPadding: CGFloat = 5
     }
 
     // MARK: - Scrollbar
