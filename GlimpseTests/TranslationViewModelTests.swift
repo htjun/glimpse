@@ -2,9 +2,6 @@
 //  TranslationViewModelTests.swift
 //  GlimpseTests
 //
-//  Created by Glimpse Contributors on 9/1/2026.
-//
-
 import Testing
 @testable import Glimpse
 

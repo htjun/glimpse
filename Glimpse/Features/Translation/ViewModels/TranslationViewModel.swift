@@ -2,9 +2,6 @@
 //  TranslationViewModel.swift
 //  Glimpse
 //
-//  Created by Glimpse Contributors on 9/1/2026.
-//
-
 import Foundation
 
 /// View model for the translation panel, holding shared state between hotkey handler and UI.

@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Resolve Swift package dependencies
+        run: xcodebuild -resolvePackageDependencies -project Glimpse.xcodeproj -scheme Glimpse -clonedSourcePackagesDirPath .spm
+
+      - name: Run unit tests
+        run: xcodebuild -project Glimpse.xcodeproj -scheme Glimpse -destination 'platform=macOS' -derivedDataPath DerivedData -clonedSourcePackagesDirPath .spm CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test

@@ -2,9 +2,6 @@
 //  SettingsView.swift
 //  Glimpse
 //
-//  Created by Glimpse Contributors on 1/11/2026.
-//
-
 import KeyboardShortcuts
 import SwiftUI
 

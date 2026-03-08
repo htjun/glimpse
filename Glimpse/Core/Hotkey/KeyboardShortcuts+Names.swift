@@ -2,9 +2,6 @@
 //  KeyboardShortcuts+Names.swift
 //  Glimpse
 //
-//  Created by Glimpse Contributors on 9/1/2026.
-//
-
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {

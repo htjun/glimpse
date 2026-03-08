@@ -2,9 +2,6 @@
 //  AppDelegate.swift
 //  Glimpse
 //
-//  Created by Glimpse Contributors on 9/1/2026.
-//
-
 import AppKit
 import KeyboardShortcuts
 import os.log

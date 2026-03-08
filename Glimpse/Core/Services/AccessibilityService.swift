@@ -2,9 +2,6 @@
 //  AccessibilityService.swift
 //  Glimpse
 //
-//  Created by Glimpse Contributors on 9/1/2026.
-//
-
 import AppKit
 import Carbon.HIToolbox
 import os.log

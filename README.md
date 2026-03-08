@@ -7,103 +7,104 @@ A lightweight macOS menu bar app for instant translation of selected text.
 
 ## Overview
 
-Glimpse runs quietly in your menu bar and activates instantly with a global hotkey. Select text in any application, press the hotkey, and get a translation in a floating panel—no context switching required.
+Glimpse stays in the menu bar and opens with a global shortcut. Select text in any app, press the shortcut, and Glimpse captures the selection, shows a floating panel, and translates without forcing an app switch.
 
 ## Features
 
-- **Menu Bar App** — Runs in the background with no Dock icon
-- **Global Hotkey** — Activate from anywhere with `Cmd+Shift+Space`
-- **Automatic Text Capture** — Grabs selected text from any application via accessibility APIs
-- **Floating Panel** — Translation appears in a non-intrusive floating window
-- **Native Translation** — Uses Apple's built-in Translation API for fast, private translations
-- **Dictionary Lookup** — Single words show definitions from macOS Dictionary before translation
+- Menu bar app with no Dock icon
+- Global hotkey: `Cmd+Shift+Space`
+- Accessibility-based selected text capture
+- Floating translation panel with dictionary fallback for single words
+- Apple Translation backend for native translation on macOS 15.5+
+- Optional local TranslateGemma backend with offline translations after the initial model download
 
 ## Requirements
 
 - macOS 15.5 or later
-- Accessibility permissions (required for text capture)
+- Xcode 16.4 or later for development
+- Accessibility permission for text capture
+- Apple Silicon recommended for the local TranslateGemma backend
 
-> **Note:** Glimpse requires accessibility access and cannot be sandboxed, so it's distributed directly rather than through the App Store.
+> Glimpse requires accessibility access and runs outside the App Store sandbox. Expect direct distribution or local builds instead of App Store deployment.
 
-## Installation
-
-### Building from Source
+## Build From Source
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/yourusername/Glimpse.git
+   git clone https://github.com/htjun/Glimpse.git
    cd Glimpse
    ```
 
-2. Open in Xcode:
-   ```bash
-   open Glimpse.xcodeproj
-   ```
+2. Open [Glimpse.xcodeproj](Glimpse.xcodeproj) in Xcode.
+3. Select a personal signing team for the `Glimpse` target if you want to run the app locally.
+4. Build and run the shared `Glimpse` scheme.
 
-3. Build and run (`Cmd+R`)
+### Command-line build and test
 
-### Granting Accessibility Permissions
-
-On first launch, Glimpse will request accessibility permissions:
-
-1. Go to **System Settings → Privacy & Security → Accessibility**
-2. Enable **Glimpse** in the list
-3. Restart Glimpse if needed
-
-## Usage
-
-1. **Activate**: Press `Cmd+Shift+Space` (or click the menu bar icon)
-2. **Translate**: Selected text is automatically captured and ready for translation
-3. **Shortcuts**:
-   - `Cmd+Return` — Translate
-   - `Escape` — Close panel
-
-## Development
-
-### Build Commands
+These commands avoid code signing, which is useful for CI and local verification:
 
 ```bash
 # Build
-xcodebuild -project Glimpse.xcodeproj -scheme Glimpse -configuration Debug build
+xcodebuild -project Glimpse.xcodeproj -scheme Glimpse -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
 
-# Run tests
-xcodebuild -project Glimpse.xcodeproj -scheme Glimpse test
-
-# Clean
-xcodebuild -project Glimpse.xcodeproj -scheme Glimpse clean
+# Test
+xcodebuild -project Glimpse.xcodeproj -scheme Glimpse -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO test
 ```
 
-### Code Quality
+## Accessibility Setup
+
+On first launch, Glimpse asks for accessibility access so it can read selected text from other applications.
+
+1. Open **System Settings -> Privacy & Security -> Accessibility**
+2. Enable **Glimpse**
+3. Restart the app if macOS does not grant access immediately
+
+## Translation Backends
+
+### Apple Translation
+
+- Built into macOS 15.5+
+- No extra setup beyond app permissions
+- Best default path for most contributors and users
+
+### TranslateGemma (Local)
+
+Glimpse can run translations through a local MLX-backed TranslateGemma model.
+
+- Available models:
+  - `TranslateGemma 4B` (`~3 GB`, recommended `8 GB+` RAM)
+  - `TranslateGemma 12B` (`~7 GB`, recommended `16 GB+` RAM)
+  - `TranslateGemma 27B` (`~15 GB`, recommended `32 GB+` RAM)
+- Models are downloaded on demand from Hugging Face the first time you request them.
+- After download, translations can run fully offline.
+- The local backend is exposed in Settings and loads automatically on launch if a model is already present.
+
+Before downloading model weights, review the upstream model card and license terms that apply to your use.
+
+## Development
+
+### Code quality
 
 ```bash
-# Lint (requires: brew install swiftlint)
 swiftlint
-
-# Format (requires: brew install swiftformat)
 swiftformat .
 ```
 
-### Project Structure
+### Project structure
 
-```
+```text
 Glimpse/
-├── App/                    # Entry point, AppDelegate
-├── Features/
-│   ├── Translation/        # Translation panel views and view models
-│   └── Settings/           # Settings window
-├── Core/
-│   ├── Hotkey/             # KeyboardShortcuts extension
-│   └── Services/           # AccessibilityService, WindowManager, DictionaryService
-├── Shared/
-│   ├── Components/         # Reusable button styles
-│   ├── DesignSystem/       # Theme, colors, typography
-│   ├── Extensions/
-│   └── Utilities/
-└── Resources/              # Assets, Fonts, Info.plist, Entitlements
+├── App/                 # App entry point and lifecycle
+├── Core/                # Accessibility, panel, window, and translation services
+├── Features/            # Translation and settings UI
+├── Resources/           # Assets, fonts, entitlements, and Info.plist
+└── Shared/              # Reusable components and design system
 ```
-
-See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 
 ## Dependencies
 
-- [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus — Global hotkey registration
+- [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) for global hotkeys
+- Vendored [mlx-swift-lm](https://github.com/ml-explore/mlx-swift-lm) packages for local TranslateGemma support
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for bundled asset and dependency notes.

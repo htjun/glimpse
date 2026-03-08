@@ -2,9 +2,6 @@
 //  WindowManagerTests.swift
 //  GlimpseTests
 //
-//  Created by Glimpse Contributors on 9/1/2026.
-//
-
 import AppKit
 import Foundation
 import Testing
